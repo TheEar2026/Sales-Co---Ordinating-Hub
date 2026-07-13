@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { handleHandover } from '../../lib/handover'
 import { useAuth } from '../../hooks/useAuth'
 import type { MotionBDailyLead } from '../../types'
+import Icon from '../shared/Icon'
 
 interface HandoverModalProps {
   lead: MotionBDailyLead
@@ -36,40 +37,43 @@ export default function HandoverModal({ lead, onClose, onSuccess, onError }: Han
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
-      <div className="w-full max-w-sm rounded-lg bg-white p-5 shadow-xl">
-        <h3 className="mb-1 text-base font-semibold text-navy">Hand this lead to Rus</h3>
-        <p className="mb-3 text-xs text-gray-500">
+      <div className="w-full max-w-sm rounded-xl bg-white p-5 shadow-2xl">
+        <div className="mb-1 flex items-center gap-2">
+          <Icon name="notifications_active" size={20} className="text-amber" filled />
+          <h3 className="text-body-md font-bold text-navy">Hand this lead to Rus</h3>
+        </div>
+        <p className="mb-4 text-body-sm text-text-muted">
           {lead.contact_name} · {lead.school_name}
         </p>
 
-        <label className="mb-1 block text-xs font-medium text-gray-600">
+        <label className="micro-label mb-1.5 block text-text-muted">
           Demo date/time if already booked
         </label>
         <input
           type="datetime-local"
           value={demoDate}
           onChange={(e) => setDemoDate(e.target.value)}
-          className="mb-3 w-full rounded border border-gray-300 px-2 py-1.5 text-sm"
+          className="mb-4 w-full rounded-lg border border-border bg-surface px-3 py-2 text-body-sm focus:outline-none focus:ring-2 focus:ring-gold"
         />
 
-        <label className="mb-1 block text-xs font-medium text-gray-600">Notes for Rus (optional)</label>
+        <label className="micro-label mb-1.5 block text-text-muted">Notes for Rus (optional)</label>
         <textarea
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
           rows={3}
-          className="mb-4 w-full rounded border border-gray-300 px-3 py-2 text-sm"
+          className="mb-4 w-full rounded-lg border border-border bg-surface px-3 py-2 text-body-sm focus:outline-none focus:ring-2 focus:ring-gold"
         />
 
         <div className="flex justify-end gap-2">
-          <button onClick={onClose} className="rounded px-3 py-1.5 text-sm text-gray-500">
+          <button onClick={onClose} className="rounded-lg px-4 py-2 text-body-sm font-bold text-text-muted">
             Cancel
           </button>
           <button
             onClick={confirm}
             disabled={submitting}
-            className="rounded bg-green px-3 py-1.5 text-sm font-medium text-white disabled:opacity-50"
+            className="flex items-center gap-1.5 rounded-lg bg-green px-4 py-2 text-body-sm font-bold text-white transition-opacity hover:opacity-90 disabled:opacity-50"
           >
-            Confirm handover
+            <Icon name="check_circle" size={18} /> Confirm handover
           </button>
         </div>
       </div>

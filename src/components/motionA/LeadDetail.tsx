@@ -3,6 +3,7 @@ import { supabase } from '../../lib/supabase'
 import type { MotionADailyLead } from '../../types'
 import StatusChip from '../shared/StatusChip'
 import TierBadge from '../shared/TierBadge'
+import Icon from '../shared/Icon'
 import TouchHistory from './TouchHistory'
 import DetailFooter from './DetailFooter'
 
@@ -42,58 +43,64 @@ export default function LeadDetail({ lead, onUpdated }: LeadDetailProps) {
   }
 
   return (
-    <div className="flex flex-1 flex-col overflow-hidden">
-      <div className="flex-1 overflow-y-auto px-6 py-5">
-        <div className="mb-4">
-          <h2 className="text-xl font-semibold text-navy">{lead.contact_name}</h2>
-          <p className="text-sm text-gray-500">
-            {lead.school_name}
-            {lead.contact_role && ` · ${lead.contact_role}`}
+    <article className="flex flex-1 flex-col overflow-hidden bg-white">
+      <div className="flex-1 overflow-y-auto">
+        {/* header */}
+        <section className="border-b border-border px-8 py-6">
+          <h1 className="text-headline-lg text-navy">{lead.contact_name}</h1>
+          <p className="mt-1 text-body-md text-text-muted">
+            {lead.contact_role && <>{lead.contact_role} · </>}
+            <span className="font-semibold text-brand-gold">{lead.school_name}</span>
           </p>
-          <div className="mt-2 flex flex-wrap items-center gap-2">
+          <div className="mt-3 flex flex-wrap items-center gap-2">
             <StatusChip status={lead.status} />
             <TierBadge tier={lead.tier} />
-            <span className="text-xs text-gray-500">{formatZAR(lead.ac_deal_value)}</span>
-            <span className="text-xs text-gray-500">
-              {lead.days_since_last_touch != null ? `${lead.days_since_last_touch}d silent` : 'No touch yet'}
+            <span className="font-mono text-[13px] text-text-muted">{formatZAR(lead.ac_deal_value)}</span>
+            <span className="font-mono text-[13px] text-text-muted">
+              {lead.days_since_last_touch != null ? `${lead.days_since_last_touch}d silent` : 'no touch'}
             </span>
-            <span className="text-xs text-gray-500">{lead.owner === 'rus' ? 'Rus' : 'Coordinator'}</span>
           </div>
-        </div>
+        </section>
 
-        <div className="mb-4 rounded-lg bg-gold-light px-4 py-3">
-          <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-gold">
-            Next action
-          </label>
-          <textarea
-            value={nextAction}
-            onChange={(e) => setNextAction(e.target.value)}
-            onBlur={saveNextAction}
-            rows={2}
-            placeholder="What's the next step for this contact?"
-            className="w-full resize-none rounded border-none bg-transparent text-sm text-navy placeholder:text-gold/50 focus:outline-none"
-          />
-        </div>
+        <section className="space-y-8 px-8 py-6">
+          {/* Next action */}
+          <div className="rounded-lg border border-brand-gold/20 bg-gold-light p-5">
+            <div className="mb-2 flex items-center gap-2">
+              <Icon name="bolt" filled className="text-brand-gold" size={18} />
+              <h3 className="micro-label text-brand-gold">Next action</h3>
+            </div>
+            <textarea
+              value={nextAction}
+              onChange={(e) => setNextAction(e.target.value)}
+              onBlur={saveNextAction}
+              rows={2}
+              placeholder="What's the next step for this contact?"
+              className="w-full resize-none border-none bg-transparent text-[18px] leading-snug text-navy placeholder:text-brand-gold/50 focus:outline-none"
+            />
+          </div>
 
-        <div className="mb-5">
-          <h3 className="mb-1 text-xs font-semibold uppercase tracking-wide text-gray-400">Notes</h3>
-          <textarea
-            value={notes}
-            onChange={(e) => setNotes(e.target.value)}
-            onBlur={saveNotes}
-            rows={5}
-            placeholder="Full running notes for this contact…"
-            className="w-full rounded border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gold"
-          />
-        </div>
+          {/* Notes */}
+          <div>
+            <h3 className="micro-label mb-3 text-text-muted">Internal notes</h3>
+            <textarea
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              onBlur={saveNotes}
+              rows={5}
+              placeholder="Full running notes for this contact…"
+              className="w-full rounded-lg border border-border bg-surface p-4 text-body-md leading-relaxed text-on-surface focus:outline-none focus:ring-2 focus:ring-gold"
+            />
+          </div>
 
-        <div>
-          <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-400">Touch history</h3>
-          <TouchHistory leadId={lead.id} />
-        </div>
+          {/* Touch history */}
+          <div>
+            <h3 className="micro-label mb-4 text-text-muted">Touch history</h3>
+            <TouchHistory leadId={lead.id} />
+          </div>
+        </section>
       </div>
 
       <DetailFooter lead={lead} onUpdated={onUpdated} />
-    </div>
+    </article>
   )
 }

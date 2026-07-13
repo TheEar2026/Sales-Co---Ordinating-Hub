@@ -2,6 +2,7 @@ import { useState, type FormEvent } from 'react'
 import { useAuth } from '../hooks/useAuth'
 import { isDemoMode } from '../lib/supabase'
 import EarLogo from '../components/shared/EarLogo'
+import Icon from '../components/shared/Icon'
 
 export default function Login() {
   const { signIn } = useAuth()
@@ -20,63 +21,95 @@ export default function Login() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-navy">
-      <div className="w-full max-w-sm bg-white rounded-lg shadow-lg p-8">
-        <EarLogo className="h-16 w-auto text-[#9E814B]" />
-        <p className="mt-3 mb-6 text-xs font-medium uppercase tracking-[0.2em] text-gray-400">
-          Sales dashboard
-        </p>
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-navy p-4">
+      {/* atmospheric depth */}
+      <div className="pointer-events-none fixed inset-0 -z-10">
+        <div className="absolute inset-0 bg-gradient-to-tr from-navy via-transparent to-[#0e1d2c] opacity-40" />
+        <div className="absolute -bottom-24 -left-24 h-96 w-96 rounded-full bg-brand-gold/5 blur-3xl" />
+        <div className="absolute -right-24 -top-24 h-96 w-96 rounded-full bg-[#b9c8dc]/5 blur-3xl" />
+      </div>
 
-        {isDemoMode && (
-          <div className="mb-4 rounded bg-amber-light px-3 py-2 text-xs text-amber">
-            <strong>Demo mode</strong> — sample data, no live database.
-            <br />
-            Rus: rus@the-ear.com · Coordinator: coordinator@the-ear.com
-            <br />
-            Password: <code>demo</code>
+      <div className="w-full max-w-[380px] overflow-hidden rounded-xl bg-white shadow-2xl">
+        <div className="px-8 pb-6 pt-10 text-center">
+          <div className="mb-4 flex justify-center">
+            <EarLogo className="h-12 w-auto text-[#9E814B]" />
           </div>
-        )}
+          <p className="micro-label text-text-muted">Sales Dashboard</p>
+        </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-              Email
+        <form onSubmit={handleSubmit} className="space-y-5 px-8 pb-8">
+          {isDemoMode && (
+            <div className="rounded-lg bg-amber-light px-3 py-2 text-xs text-amber">
+              <strong>Demo mode</strong> — sample data, no live database.
+              <br />
+              rus@the-ear.com · coordinator@the-ear.com · pw <code>demo</code>
+            </div>
+          )}
+
+          <div className="space-y-1.5">
+            <label htmlFor="email" className="micro-label block text-text-muted">
+              Email address
             </label>
-            <input
-              id="email"
-              type="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full rounded border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gold"
-              autoComplete="email"
-            />
+            <div className="relative flex items-center">
+              <Icon name="mail" className="absolute left-3 text-text-muted" size={18} />
+              <input
+                id="email"
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="you@the-ear.com"
+                autoComplete="email"
+                className="w-full rounded-lg border border-border bg-surface py-2.5 pl-10 pr-4 text-body-md text-navy placeholder:text-text-muted/60 focus:outline-none focus:ring-2 focus:ring-gold"
+              />
+            </div>
           </div>
-          <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+
+          <div className="space-y-1.5">
+            <label htmlFor="password" className="micro-label block text-text-muted">
               Password
             </label>
-            <input
-              id="password"
-              type="password"
-              required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full rounded border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gold"
-              autoComplete="current-password"
-            />
+            <div className="relative flex items-center">
+              <Icon name="lock" className="absolute left-3 text-text-muted" size={18} />
+              <input
+                id="password"
+                type="password"
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="••••••••"
+                autoComplete="current-password"
+                className="w-full rounded-lg border border-border bg-surface py-2.5 pl-10 pr-4 text-body-md text-navy placeholder:text-text-muted/60 focus:outline-none focus:ring-2 focus:ring-gold"
+              />
+            </div>
           </div>
 
-          {error && <p className="text-sm text-red">{error}</p>}
+          {error && <p className="text-body-sm text-red">{error}</p>}
 
           <button
             type="submit"
             disabled={submitting}
-            className="w-full bg-navy text-white rounded py-2 font-medium hover:bg-navy/90 disabled:opacity-50"
+            className="group flex w-full items-center justify-center gap-2 rounded-lg bg-navy py-3 font-bold text-white transition-all hover:bg-[#0e1d2c] active:scale-[0.98] disabled:opacity-50"
           >
-            {submitting ? 'Signing in…' : 'Sign in'}
+            {submitting ? (
+              <>
+                <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white" />
+                <span>Signing in…</span>
+              </>
+            ) : (
+              <>
+                <span>Sign in</span>
+                <Icon
+                  name="arrow_forward"
+                  size={18}
+                  className="transition-transform group-hover:translate-x-1"
+                />
+              </>
+            )}
           </button>
         </form>
+
+        <div className="h-1 w-full bg-brand-gold opacity-80" />
       </div>
     </div>
   )

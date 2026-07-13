@@ -67,11 +67,11 @@ export default function TemplateEditor({ onClose }: { onClose: () => void }) {
 
   return (
     <div className="fixed inset-0 z-50 flex bg-black/30">
-      <div className="m-auto flex h-[85vh] w-[90vw] max-w-5xl overflow-hidden rounded-lg bg-white shadow-xl">
-        <div className="flex w-72 shrink-0 flex-col overflow-y-auto border-r border-gray-200">
-          <div className="flex items-center justify-between border-b border-gray-100 px-4 py-3">
-            <h2 className="text-sm font-semibold text-navy">Templates</h2>
-            <button onClick={onClose} className="text-sm text-gray-400 hover:text-gray-600">
+      <div className="m-auto flex h-[85vh] w-[90vw] max-w-5xl overflow-hidden rounded-xl bg-white shadow-2xl">
+        <div className="flex w-72 shrink-0 flex-col overflow-y-auto border-r border-border">
+          <div className="flex items-center justify-between border-b border-border px-4 py-3">
+            <h2 className="text-body-md font-bold text-navy">Templates</h2>
+            <button onClick={onClose} className="text-text-muted hover:text-navy">
               ✕
             </button>
           </div>
@@ -83,8 +83,8 @@ export default function TemplateEditor({ onClose }: { onClose: () => void }) {
               const group = templates.filter((t) => t.persona === persona)
               if (group.length === 0) return null
               return (
-                <div key={persona} className="border-b border-gray-50 px-3 py-2">
-                  <div className="mb-1 text-xs font-semibold uppercase tracking-wide text-gray-400">{persona}</div>
+                <div key={persona} className="border-b border-border/60 px-3 py-2">
+                  <div className="micro-label mb-1 text-text-muted">{persona}</div>
                   {group.map((t) => (
                     <div
                       key={t.id}
@@ -137,21 +137,21 @@ export default function TemplateEditor({ onClose }: { onClose: () => void }) {
             </div>
           ) : (
             <div className="flex-1">
-              <label className="mb-1 block text-xs font-medium text-gray-600">Subject</label>
+              <label className="micro-label mb-1.5 block text-text-muted">Subject line</label>
               <input
                 value={editor.subject}
                 onChange={(e) => setEditor({ ...editor, subject: e.target.value })}
-                className="mb-4 w-full rounded border border-gray-300 px-3 py-2 text-sm"
+                className="mb-4 w-full rounded-lg border border-border bg-surface px-3 py-2 text-body-md focus:outline-none focus:ring-2 focus:ring-gold"
               />
 
-              <label className="mb-1 block text-xs font-medium text-gray-600">Body</label>
+              <label className="micro-label mb-1.5 block text-text-muted">Email body</label>
               <textarea
                 value={editor.body}
                 onChange={(e) => setEditor({ ...editor, body: e.target.value })}
                 rows={16}
-                className="w-full rounded border border-gray-300 px-3 py-2 font-mono text-sm"
+                className="w-full rounded-lg border border-border bg-surface px-3 py-2 font-mono text-[13px] leading-relaxed focus:outline-none focus:ring-2 focus:ring-gold"
               />
-              <p className="mt-2 text-xs text-gray-400">
+              <p className="mt-2 text-body-sm text-text-muted">
                 Merge fields: {'{{first_name}}'}, {'{{school_name}}'}, {'{{contact_role}}'}
               </p>
 
@@ -159,13 +159,13 @@ export default function TemplateEditor({ onClose }: { onClose: () => void }) {
                 <button
                   onClick={save}
                   disabled={saving}
-                  className="rounded bg-navy px-4 py-1.5 text-sm font-medium text-white disabled:opacity-50"
+                  className="rounded-lg bg-navy px-4 py-2 text-body-sm font-bold text-white disabled:opacity-50"
                 >
                   Save
                 </button>
                 <button
                   onClick={() => setPreviewing(true)}
-                  className="rounded border border-gray-300 px-4 py-1.5 text-sm text-gray-600"
+                  className="rounded-lg border border-border px-4 py-2 text-body-sm font-bold text-navy hover:bg-surface"
                 >
                   Preview
                 </button>

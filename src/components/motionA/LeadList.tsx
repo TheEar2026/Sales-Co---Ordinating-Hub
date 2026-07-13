@@ -11,14 +11,14 @@ interface LeadListProps {
 
 export default function LeadList({ leads, loading, selectedId, onSelect }: LeadListProps) {
   return (
-    <div className="flex w-[310px] shrink-0 flex-col overflow-y-auto border-r border-gray-200 bg-white">
-      <div className="border-b border-gray-100 px-3 py-2 text-xs font-semibold uppercase tracking-wide text-gray-400">
-        Rus — daily priority list ({leads.length})
-      </div>
+    <aside className="flex w-[310px] shrink-0 flex-col overflow-y-auto border-r border-border bg-white">
+      <header className="border-b border-border bg-surface px-3 py-2.5">
+        <h2 className="micro-label text-navy">Rus — daily priority list ({leads.length})</h2>
+      </header>
       {loading ? (
         <LoadingSpinner label="Loading leads…" />
       ) : leads.length === 0 ? (
-        <div className="px-3 py-8 text-center text-sm text-gray-400">No active leads.</div>
+        <div className="px-3 py-8 text-center text-body-sm text-text-muted">No active leads.</div>
       ) : (
         leads.map((lead) => (
           <LeadCard
@@ -29,6 +29,6 @@ export default function LeadList({ leads, loading, selectedId, onSelect }: LeadL
           />
         ))
       )}
-    </div>
+    </aside>
   )
 }

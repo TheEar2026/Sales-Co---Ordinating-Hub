@@ -116,7 +116,7 @@ export default function Dashboard() {
           {selectedALead ? (
             <LeadDetail lead={selectedALead} onUpdated={refetchA} />
           ) : (
-            <div className="flex flex-1 items-center justify-center text-sm text-gray-400">
+            <div className="flex flex-1 items-center justify-center bg-surface text-body-md text-text-muted">
               Select a lead to see details.
             </div>
           )}
@@ -139,7 +139,7 @@ export default function Dashboard() {
               onToast={(type, message) => setToast({ type, message })}
             />
           ) : (
-            <div className="flex flex-1 items-center justify-center text-sm text-gray-400">
+            <div className="flex flex-1 items-center justify-center bg-surface text-body-md text-text-muted">
               Select a lead from the queue.
             </div>
           )}

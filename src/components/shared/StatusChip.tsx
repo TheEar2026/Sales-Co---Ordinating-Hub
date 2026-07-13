@@ -1,7 +1,7 @@
 import type { LeadStatus } from '../../types'
 
 const STATUS_STYLES: Record<LeadStatus, string> = {
-  untouched: 'bg-gray-100 text-gray-600',
+  untouched: 'bg-gray-100 text-text-muted',
   't1-sent': 'bg-gold-light text-gold',
   't2-sent': 'bg-gold-light text-gold',
   't3-sent': 'bg-gold-light text-gold',
@@ -13,7 +13,7 @@ const STATUS_STYLES: Record<LeadStatus, string> = {
   close: 'bg-green-light text-green',
   won: 'bg-green-light text-green',
   lost: 'bg-red-light text-red',
-  parked: 'bg-gray-100 text-gray-500',
+  parked: 'bg-gray-100 text-text-muted',
   declined: 'bg-red-light text-red',
   blocked: 'bg-red-light text-red',
 }
@@ -39,7 +39,7 @@ const STATUS_LABELS: Record<LeadStatus, string> = {
 export default function StatusChip({ status }: { status: LeadStatus }) {
   return (
     <span
-      className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${STATUS_STYLES[status]}`}
+      className={`inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-semibold ${STATUS_STYLES[status]}`}
     >
       {STATUS_LABELS[status]}
     </span>

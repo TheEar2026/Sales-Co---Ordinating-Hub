@@ -3,6 +3,7 @@ import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../hooks/useAuth'
 import type { LeadStatus, MotionADailyLead, TouchNumber } from '../../types'
 import DatePicker from '../shared/DatePicker'
+import Icon from '../shared/Icon'
 
 const REPLY_STATUS_OPTIONS: { value: LeadStatus; label: string }[] = [
   { value: 'demo-booked', label: 'Demo booked' },
@@ -98,7 +99,7 @@ export default function DetailFooter({ lead, onUpdated }: DetailFooterProps) {
   }
 
   return (
-    <div className="border-t border-gray-200 bg-white px-4 py-3">
+    <div className="border-t border-border bg-white px-4 py-3 shadow-[0_-4px_12px_rgba(0,0,0,0.03)]">
       {noteOpen && (
         <div className="mb-3">
           <textarea
@@ -170,23 +171,23 @@ export default function DetailFooter({ lead, onUpdated }: DetailFooterProps) {
           <button
             onClick={markContacted}
             disabled={busy}
-            className="rounded bg-green px-3 py-1.5 text-sm font-medium text-white disabled:opacity-50"
+            className="flex items-center gap-1.5 rounded bg-green px-4 py-2 text-body-sm font-bold text-white transition-opacity hover:opacity-90 disabled:opacity-50"
           >
-            ✓ Mark contacted
+            <Icon name="check_circle" size={18} /> Mark contacted
           </button>
           <button
             onClick={() => setReplyModalOpen(true)}
             disabled={busy}
-            className="rounded bg-gold-mid px-3 py-1.5 text-sm font-medium text-white disabled:opacity-50"
+            className="flex items-center gap-1.5 rounded bg-gold-mid px-4 py-2 text-body-sm font-bold text-white transition-opacity hover:opacity-90 disabled:opacity-50"
           >
-            ↩ Reply received
+            <Icon name="reply" size={18} /> Reply received
           </button>
           <button
             onClick={() => setNoteOpen(true)}
             disabled={busy}
-            className="rounded border border-gray-300 px-3 py-1.5 text-sm text-gray-600 disabled:opacity-50"
+            className="flex items-center gap-1.5 rounded border border-border px-4 py-2 text-body-sm font-bold text-navy transition-colors hover:bg-surface disabled:opacity-50"
           >
-            Log note
+            <Icon name="edit_note" size={18} /> Log note
           </button>
         </div>
 
@@ -197,9 +198,9 @@ export default function DetailFooter({ lead, onUpdated }: DetailFooterProps) {
             onChange={updateNextTouchDate}
             tooltip="Set based on what this contact needs — not a fixed interval."
           />
-          <span className="flex items-center gap-1.5 text-xs text-gray-500">
+          <span className="flex items-center gap-1.5 rounded bg-surface px-2 py-1 text-body-sm text-navy">
             <span className={`h-2 w-2 rounded-full ${lead.owner === 'rus' ? 'bg-gold-mid' : 'bg-green'}`} />
-            {lead.owner === 'rus' ? 'Rus — personal' : 'Coordinator'}
+            <span className="font-semibold">{lead.owner === 'rus' ? 'Rus' : 'Coordinator'}</span>
           </span>
         </div>
       </div>

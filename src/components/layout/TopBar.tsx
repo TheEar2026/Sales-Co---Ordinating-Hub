@@ -20,7 +20,7 @@ function UserChip({ initials, dotColor, active }: UserChipProps) {
   return (
     <span
       className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium ${
-        active ? 'border-gold-mid bg-white/10 text-white' : 'border-white/20 text-white/60'
+        active ? 'border-gold-mid bg-white/10 text-white' : 'border-white/20 text-white/50'
       }`}
     >
       <span className={`h-1.5 w-1.5 rounded-full ${dotColor === 'gold' ? 'bg-gold-mid' : 'bg-green'}`} />
@@ -38,25 +38,26 @@ export default function TopBar({ onOpenTemplates }: TopBarProps) {
   const today = new Date()
 
   return (
-    <header className="flex items-center justify-between border-b-[3px] border-gold bg-navy px-6 py-3 text-white">
-      <div className="flex items-center gap-4">
-        <span className="flex items-center gap-2.5">
-          <EarLogo className="h-9 w-auto text-gold-mid" />
-          <span className="text-xs font-medium uppercase tracking-[0.2em] text-white/60">Sales</span>
-        </span>
-        <span className="rounded bg-white/10 px-2 py-1 text-xs">
-          {format(today, 'EEEE d MMMM yyyy')} · Term week {termWeek(today)}
-        </span>
+    <header className="flex h-[56px] items-center justify-between border-b-4 border-brand-gold bg-navy px-4 text-white">
+      <div className="flex items-center gap-3">
+        <EarLogo className="h-8 w-auto text-gold-mid" />
+        <span className="micro-label text-white/50">Sales</span>
       </div>
 
-      <div className="flex items-center gap-3">
-        <UserChip initials="RN" dotColor="gold" active={profile?.role === 'rus'} />
-        <UserChip initials="SC" dotColor="green" active={profile?.role === 'coordinator'} />
+      <div className="flex items-center gap-4">
+        <span className="micro-label text-white/60">
+          {format(today, 'd MMM yyyy')} · Term wk {termWeek(today)}
+        </span>
+
+        <div className="flex items-center gap-2">
+          <UserChip initials="RN" dotColor="gold" active={profile?.role === 'rus'} />
+          <UserChip initials="SC" dotColor="green" active={profile?.role === 'coordinator'} />
+        </div>
 
         {profile?.role === 'rus' && (
           <button
             onClick={onOpenTemplates}
-            className="text-xs text-white/70 underline-offset-2 hover:text-white hover:underline"
+            className="micro-label text-white/60 transition-colors hover:text-brand-gold"
           >
             Templates
           </button>
@@ -64,7 +65,7 @@ export default function TopBar({ onOpenTemplates }: TopBarProps) {
 
         <button
           onClick={signOut}
-          className="rounded border border-white/30 px-3 py-1 text-xs text-white/80 hover:bg-white/10"
+          className="rounded border border-white/30 px-3 py-1 text-xs text-white/80 transition-colors hover:bg-white/10"
         >
           Logout
         </button>

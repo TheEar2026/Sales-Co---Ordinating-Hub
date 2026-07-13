@@ -2,6 +2,7 @@ import type { MotionBDailyLead } from '../../types'
 import { useScorecard } from '../../hooks/useScorecard'
 import QueueCard from './QueueCard'
 import LoadingSpinner from '../shared/LoadingSpinner'
+import Icon from '../shared/Icon'
 
 const MOTION_B_POOL = 204
 
@@ -30,44 +31,44 @@ export default function OutreachQueue({ leads, loading, selectedId, doneIds, onS
   const sections: Section[] = [
     { key: 't1', title: 'T1s — first touch today', dividerClass: 'bg-navy text-white', leads: t1s },
     { key: 't2', title: 'T2 follow-ups due today', dividerClass: 'bg-amber-light text-amber', leads: t2s },
-    { key: 't3', title: 'T3 follow-ups due today', dividerClass: 'bg-gray-100 text-gray-600', leads: t3s },
+    { key: 't3', title: 'T3 follow-ups due today', dividerClass: 'bg-gray-100 text-on-surface-variant', leads: t3s },
   ]
 
   const touched = scorecard?.motion_b_touched ?? 0
   const poolPct = Math.min(100, (touched / MOTION_B_POOL) * 100)
 
   return (
-    <div className="flex w-[370px] shrink-0 flex-col overflow-y-auto border-r border-gray-200 bg-white">
-      <div className="border-b border-gray-100 px-3 py-3">
-        <h2 className="text-sm font-semibold text-navy">Coordinator outreach queue</h2>
-        <div className="mt-1.5 text-xs text-gray-500">
+    <aside className="flex w-[370px] shrink-0 flex-col overflow-y-auto border-r border-border bg-white">
+      <header className="border-b border-border px-3 py-3">
+        <h2 className="text-body-md font-bold text-navy">Coordinator outreach queue</h2>
+        <div className="micro-label mt-2 text-text-muted">
           Pool progress · {touched}/{MOTION_B_POOL}
         </div>
         <div className="mt-1 h-1.5 w-full rounded-full bg-gray-100">
           <div className="h-1.5 rounded-full bg-green" style={{ width: `${poolPct}%` }} />
         </div>
 
-        <div className="mt-3 flex gap-3 text-xs text-gray-600">
+        <div className="mt-3 flex gap-3 font-mono text-[12px] text-on-surface-variant">
           <span>T1: {t1s.length}</span>
           <span>T2: {t2s.length}</span>
           <span>T3: {t3s.length}</span>
         </div>
 
-        <p className="mt-2 text-xs text-amber">⚠️ Steady-state grows to ~12/day from Week 3</p>
-      </div>
+        <p className="mt-2 flex items-center gap-1 text-body-sm text-amber">
+          <Icon name="warning" size={15} filled /> Steady-state grows to ~12/day from Week 3
+        </p>
+      </header>
 
       {loading ? (
         <LoadingSpinner label="Loading queue…" />
       ) : leads.length === 0 ? (
-        <div className="px-3 py-8 text-center text-sm text-gray-400">Queue is clear for today.</div>
+        <div className="px-3 py-8 text-center text-body-sm text-text-muted">Queue is clear for today.</div>
       ) : (
         sections.map(
           (section) =>
             section.leads.length > 0 && (
               <div key={section.key}>
-                <div className={`px-3 py-1.5 text-xs font-semibold uppercase tracking-wide ${section.dividerClass}`}>
-                  {section.title}
-                </div>
+                <div className={`micro-label px-3 py-2 ${section.dividerClass}`}>{section.title}</div>
                 {section.leads.map((lead) => (
                   <QueueCard
                     key={lead.id}
@@ -81,6 +82,6 @@ export default function OutreachQueue({ leads, loading, selectedId, doneIds, onS
             ),
         )
       )}
-    </div>
+    </aside>
   )
 }

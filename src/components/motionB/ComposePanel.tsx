@@ -5,6 +5,7 @@ import { useTemplates, activeTemplatesForPersona } from '../../hooks/useTemplate
 import { mergeTemplate } from '../../lib/mergeTemplate'
 import type { MotionBDailyLead, TouchNumber } from '../../types'
 import DatePicker from '../shared/DatePicker'
+import Icon from '../shared/Icon'
 import HandoverModal from './HandoverModal'
 
 function touchNumberForStatus(status: MotionBDailyLead['status']): TouchNumber {
@@ -96,105 +97,121 @@ export default function ComposePanel({ lead, onDone, onToast }: ComposePanelProp
   }
 
   return (
-    <div className="flex flex-1 flex-col overflow-hidden">
-      <div className="flex-1 overflow-y-auto px-6 py-5">
-        <div className="mb-4">
-          <h2 className="text-xl font-semibold text-navy">{lead.contact_name}</h2>
-          <p className="text-sm text-gray-500">
-            {lead.school_name}
-            {lead.contact_role && ` · ${lead.contact_role}`}
+    <article className="flex flex-1 flex-col overflow-hidden bg-white">
+      <div className="flex-1 overflow-y-auto">
+        <section className="border-b border-border px-8 py-6">
+          <h1 className="text-headline-lg text-navy">{lead.contact_name}</h1>
+          <p className="mt-1 text-body-md text-text-muted">
+            {lead.contact_role && <>{lead.contact_role} · </>}
+            <span className="font-semibold text-brand-gold">{lead.school_name}</span>
           </p>
-          <div className="mt-2 flex flex-wrap items-center gap-2 text-xs">
+          <div className="mt-3 flex flex-wrap items-center gap-2 text-[11px]">
             {lead.persona && (
-              <span className="rounded bg-gray-100 px-1.5 py-0.5 font-semibold text-gray-500">{lead.persona}</span>
+              <span className="rounded bg-gray-100 px-1.5 py-0.5 font-bold text-text-muted">{lead.persona}</span>
             )}
-            <span className="rounded bg-gray-100 px-1.5 py-0.5 font-semibold text-gray-500">{touchNumber}</span>
-            <span className="text-gray-400">Coordinator sends · hand off on reply</span>
+            <span className="rounded bg-gray-100 px-1.5 py-0.5 font-bold text-text-muted">{touchNumber}</span>
+            <span className="text-text-muted">Coordinator sends · hand off on reply</span>
           </div>
-        </div>
+        </section>
 
-        <div className="mb-4 rounded-lg border border-blue-100">
-          <div className="flex items-center justify-between rounded-t-lg bg-blue-50 px-4 py-2">
-            <span className="text-xs font-semibold uppercase tracking-wide text-blue-700">Email draft</span>
-            {allPersonaTemplates.length > 1 && (
-              <select
-                value={selectedTemplateId ?? ''}
-                onChange={(e) => setSelectedTemplateId(e.target.value)}
-                className="rounded border border-blue-200 bg-white px-2 py-1 text-xs"
-              >
-                {allPersonaTemplates.map((t) => (
-                  <option key={t.id} value={t.id}>
-                    {t.name}
-                  </option>
-                ))}
-              </select>
-            )}
+        <section className="space-y-6 px-8 py-6">
+          {/* email draft */}
+          <div className="overflow-hidden rounded-lg border border-[#c7d2e5]">
+            <div className="flex items-center justify-between bg-[#eef2f9] px-4 py-2">
+              <span className="micro-label flex items-center gap-1.5 text-[#3a4859]">
+                <Icon name="draft" size={16} /> Email draft
+              </span>
+              {allPersonaTemplates.length > 1 && (
+                <select
+                  value={selectedTemplateId ?? ''}
+                  onChange={(e) => setSelectedTemplateId(e.target.value)}
+                  className="rounded border border-[#c7d2e5] bg-white px-2 py-1 text-xs"
+                >
+                  {allPersonaTemplates.map((t) => (
+                    <option key={t.id} value={t.id}>
+                      {t.name}
+                    </option>
+                  ))}
+                </select>
+              )}
+            </div>
+            <div className="px-4 py-3">
+              {selectedTemplate ? (
+                <>
+                  <div className="mb-2 text-body-md font-semibold text-navy">{mergedSubject}</div>
+                  <div className="whitespace-pre-wrap font-mono text-[13px] leading-relaxed text-on-surface-variant">
+                    {mergedBody}
+                  </div>
+                </>
+              ) : (
+                <p className="text-body-sm text-text-muted">
+                  No active template for this persona/touch combination.
+                </p>
+              )}
+            </div>
           </div>
-          <div className="px-4 py-3">
-            {selectedTemplate ? (
-              <>
-                <div className="mb-2 text-sm font-medium text-navy">{mergedSubject}</div>
-                <div className="whitespace-pre-wrap text-sm text-gray-700">{mergedBody}</div>
-              </>
-            ) : (
-              <p className="text-sm text-gray-400">No active template for this persona/touch combination.</p>
-            )}
+
+          {/* handover rule */}
+          <div className="flex gap-2 rounded-lg bg-amber-light px-4 py-3 text-body-sm text-amber">
+            <Icon name="notifications_active" size={18} className="mt-0.5 shrink-0" filled />
+            <p>
+              If {lead.contact_name} replies with genuine interest — a pricing question, a demo request, or they
+              offer a time to talk — use the button below. Do not continue the conversation yourself.
+            </p>
           </div>
-        </div>
 
-        <div className="mb-4 rounded-lg bg-amber-light px-4 py-3 text-sm text-amber">
-          If {lead.contact_name} replies with genuine interest — a pricing question, a demo request, or they offer
-          a time to talk — use the button below. Do not continue the conversation yourself.
-        </div>
-
-        <div>
-          <h3 className="mb-1 text-xs font-semibold uppercase tracking-wide text-gray-400">School context</h3>
-          <p className="whitespace-pre-wrap text-sm text-gray-600">{lead.notes || 'No notes yet.'}</p>
-        </div>
+          {/* school context */}
+          <div>
+            <h3 className="micro-label mb-2 text-text-muted">School context</h3>
+            <p className="whitespace-pre-wrap text-body-md text-on-surface-variant">
+              {lead.notes || 'No notes yet.'}
+            </p>
+          </div>
+        </section>
       </div>
 
-      <div className="border-t border-gray-200 bg-white px-4 py-3">
+      <footer className="border-t border-border bg-white px-4 py-3 shadow-[0_-4px_12px_rgba(0,0,0,0.03)]">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex flex-wrap items-center gap-2">
             <button
               onClick={markSent}
               disabled={busy || !selectedTemplate}
-              className="rounded bg-green px-3 py-1.5 text-sm font-medium text-white disabled:opacity-50"
+              className="flex items-center gap-1.5 rounded bg-green px-4 py-2 text-body-sm font-bold text-white transition-opacity hover:opacity-90 disabled:opacity-50"
             >
-              ✓ Sent — mark done
+              <Icon name="check_circle" size={18} /> Sent — mark done
             </button>
             <button
               onClick={() => setHandoverOpen(true)}
               disabled={busy}
-              className="rounded border border-amber px-3 py-1.5 text-sm font-medium text-amber disabled:opacity-50"
+              className="flex items-center gap-1.5 rounded border border-amber px-4 py-2 text-body-sm font-bold text-amber transition-colors hover:bg-amber-light disabled:opacity-50"
             >
-              🔔 Flag for Rus — reply received
+              <Icon name="notifications_active" size={18} /> Flag for Rus
             </button>
             <button
               onClick={parkLead}
               disabled={busy}
-              className="rounded border border-gray-300 px-3 py-1.5 text-sm text-gray-600 disabled:opacity-50"
+              className="flex items-center gap-1.5 rounded border border-border px-4 py-2 text-body-sm font-bold text-navy transition-colors hover:bg-surface disabled:opacity-50"
             >
-              Park — wrong contact
+              <Icon name="pause_circle" size={18} /> Park
             </button>
             <button
               onClick={editInOutlook}
               disabled={!selectedTemplate}
-              className="rounded border border-gray-300 px-3 py-1.5 text-sm text-gray-600 disabled:opacity-50"
+              className="flex items-center gap-1.5 rounded border border-border px-4 py-2 text-body-sm font-bold text-navy transition-colors hover:bg-surface disabled:opacity-50"
             >
-              Edit in Outlook
+              <Icon name="content_copy" size={18} /> Copy
             </button>
           </div>
 
           <div className="flex items-center gap-4">
             <DatePicker label="T2 if no reply:" value={lead.next_touch_date} onChange={updateT2Date} />
-            <span className="flex items-center gap-1.5 text-xs text-gray-500">
+            <span className="flex items-center gap-1.5 rounded bg-surface px-2 py-1 text-body-sm text-navy">
               <span className="h-2 w-2 rounded-full bg-green" />
-              Coordinator
+              <span className="font-semibold">Coordinator</span>
             </span>
           </div>
         </div>
-      </div>
+      </footer>
 
       {handoverOpen && (
         <HandoverModal
@@ -208,6 +225,6 @@ export default function ComposePanel({ lead, onDone, onToast }: ComposePanelProp
           onError={(message) => onToast('error', message)}
         />
       )}
-    </div>
+    </article>
   )
 }

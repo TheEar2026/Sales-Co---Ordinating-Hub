@@ -36,20 +36,20 @@ export default function CloseList() {
   if (loading) return <LoadingSpinner label="Loading CLOSE list…" />
 
   return (
-    <div className="overflow-hidden rounded-lg border border-gray-200">
-      <table className="w-full text-sm">
-        <thead className="bg-gray-50 text-xs uppercase tracking-wide text-gray-400">
+    <div className="overflow-hidden rounded-lg border border-border">
+      <table className="w-full text-body-sm">
+        <thead className="bg-surface">
           <tr>
-            <th className="px-3 py-2 text-left">Contact / School</th>
-            <th className="px-3 py-2 text-left">Stage</th>
-            <th className="px-3 py-2 text-left">Value</th>
-            <th className="px-3 py-2 text-left">Last touch (days)</th>
+            <th className="micro-label px-3 py-2 text-left text-text-muted">Contact / School</th>
+            <th className="micro-label px-3 py-2 text-left text-text-muted">Stage</th>
+            <th className="micro-label px-3 py-2 text-left text-text-muted">Value</th>
+            <th className="micro-label px-3 py-2 text-left text-text-muted">Last touch (days)</th>
           </tr>
         </thead>
         <tbody>
           {leads.length === 0 ? (
             <tr>
-              <td colSpan={4} className="px-3 py-4 text-center text-gray-400">
+              <td colSpan={4} className="px-3 py-4 text-center text-text-muted">
                 No CLOSE-tier leads.
               </td>
             </tr>
@@ -57,14 +57,20 @@ export default function CloseList() {
             leads.map((lead) => {
               const days = daysSince(lead.last_touch_date)
               return (
-                <tr key={lead.id} className="border-t border-gray-100">
+                <tr key={lead.id} className="border-t border-border">
                   <td className="px-3 py-2">
-                    <div className="font-medium text-navy">{lead.contact_name}</div>
-                    <div className="text-xs text-gray-500">{lead.school_name}</div>
+                    <div className="font-bold text-navy">{lead.contact_name}</div>
+                    <div className="text-[12px] text-text-muted">{lead.school_name}</div>
                   </td>
-                  <td className="px-3 py-2 text-gray-600">{lead.ac_deal_stage ?? lead.status}</td>
-                  <td className="px-3 py-2 text-gray-600">{formatZAR(lead.ac_deal_value)}</td>
-                  <td className={`px-3 py-2 ${days != null && days > 60 ? 'font-medium text-red' : 'text-gray-600'}`}>
+                  <td className="px-3 py-2 text-on-surface-variant">{lead.ac_deal_stage ?? lead.status}</td>
+                  <td className="px-3 py-2 font-mono tabular-nums text-on-surface-variant">
+                    {formatZAR(lead.ac_deal_value)}
+                  </td>
+                  <td
+                    className={`px-3 py-2 font-mono tabular-nums ${
+                      days != null && days > 60 ? 'font-bold text-red' : 'text-on-surface-variant'
+                    }`}
+                  >
                     {days ?? '—'}
                   </td>
                 </tr>
