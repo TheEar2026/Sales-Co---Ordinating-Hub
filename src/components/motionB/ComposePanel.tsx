@@ -97,35 +97,35 @@ export default function ComposePanel({ lead, onDone, onToast }: ComposePanelProp
   }
 
   return (
-    <article className="flex flex-1 flex-col overflow-hidden bg-white">
+    <article className="flex flex-1 flex-col overflow-hidden bg-card">
       <div className="flex-1 overflow-y-auto">
-        <section className="border-b border-border px-8 py-6">
-          <h1 className="text-headline-lg text-navy">{lead.contact_name}</h1>
-          <p className="mt-1 text-body-md text-text-muted">
+        <section className="border-b border-line px-8 py-6">
+          <h1 className="text-headline-lg text-ink">{lead.contact_name}</h1>
+          <p className="mt-1 text-body-md text-muted">
             {lead.contact_role && <>{lead.contact_role} · </>}
             <span className="font-semibold text-brand-gold">{lead.school_name}</span>
           </p>
           <div className="mt-3 flex flex-wrap items-center gap-2 text-[11px]">
             {lead.persona && (
-              <span className="rounded bg-gray-100 px-1.5 py-0.5 font-bold text-text-muted">{lead.persona}</span>
+              <span className="rounded bg-soft px-1.5 py-0.5 font-bold text-muted">{lead.persona}</span>
             )}
-            <span className="rounded bg-gray-100 px-1.5 py-0.5 font-bold text-text-muted">{touchNumber}</span>
-            <span className="text-text-muted">Coordinator sends · hand off on reply</span>
+            <span className="rounded bg-soft px-1.5 py-0.5 font-bold text-muted">{touchNumber}</span>
+            <span className="text-muted">Coordinator sends · hand off on reply</span>
           </div>
         </section>
 
         <section className="space-y-6 px-8 py-6">
           {/* email draft */}
-          <div className="overflow-hidden rounded-lg border border-[#c7d2e5]">
-            <div className="flex items-center justify-between bg-[#eef2f9] px-4 py-2">
-              <span className="micro-label flex items-center gap-1.5 text-[#3a4859]">
+          <div className="overflow-hidden rounded-lg border border-email-line">
+            <div className="flex items-center justify-between bg-email-bg px-4 py-2">
+              <span className="micro-label flex items-center gap-1.5 text-email-ink">
                 <Icon name="draft" size={16} /> Email draft
               </span>
               {allPersonaTemplates.length > 1 && (
                 <select
                   value={selectedTemplateId ?? ''}
                   onChange={(e) => setSelectedTemplateId(e.target.value)}
-                  className="rounded border border-[#c7d2e5] bg-white px-2 py-1 text-xs"
+                  className="rounded border border-email-line bg-card px-2 py-1 text-xs"
                 >
                   {allPersonaTemplates.map((t) => (
                     <option key={t.id} value={t.id}>
@@ -138,13 +138,13 @@ export default function ComposePanel({ lead, onDone, onToast }: ComposePanelProp
             <div className="px-4 py-3">
               {selectedTemplate ? (
                 <>
-                  <div className="mb-2 text-body-md font-semibold text-navy">{mergedSubject}</div>
-                  <div className="whitespace-pre-wrap font-mono text-[13px] leading-relaxed text-on-surface-variant">
+                  <div className="mb-2 text-body-md font-semibold text-ink">{mergedSubject}</div>
+                  <div className="whitespace-pre-wrap font-mono text-[13px] leading-relaxed text-muted">
                     {mergedBody}
                   </div>
                 </>
               ) : (
-                <p className="text-body-sm text-text-muted">
+                <p className="text-body-sm text-muted">
                   No active template for this persona/touch combination.
                 </p>
               )}
@@ -162,15 +162,15 @@ export default function ComposePanel({ lead, onDone, onToast }: ComposePanelProp
 
           {/* school context */}
           <div>
-            <h3 className="micro-label mb-2 text-text-muted">School context</h3>
-            <p className="whitespace-pre-wrap text-body-md text-on-surface-variant">
+            <h3 className="micro-label mb-2 text-muted">School context</h3>
+            <p className="whitespace-pre-wrap text-body-md text-muted">
               {lead.notes || 'No notes yet.'}
             </p>
           </div>
         </section>
       </div>
 
-      <footer className="border-t border-border bg-white px-4 py-3 shadow-[0_-4px_12px_rgba(0,0,0,0.03)]">
+      <footer className="border-t border-line bg-card px-4 py-3 shadow-[0_-4px_12px_rgba(0,0,0,0.03)]">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex flex-wrap items-center gap-2">
             <button
@@ -190,14 +190,14 @@ export default function ComposePanel({ lead, onDone, onToast }: ComposePanelProp
             <button
               onClick={parkLead}
               disabled={busy}
-              className="flex items-center gap-1.5 rounded border border-border px-4 py-2 text-body-sm font-bold text-navy transition-colors hover:bg-surface disabled:opacity-50"
+              className="flex items-center gap-1.5 rounded border border-line px-4 py-2 text-body-sm font-bold text-ink transition-colors hover:bg-soft disabled:opacity-50"
             >
               <Icon name="pause_circle" size={18} /> Park
             </button>
             <button
               onClick={editInOutlook}
               disabled={!selectedTemplate}
-              className="flex items-center gap-1.5 rounded border border-border px-4 py-2 text-body-sm font-bold text-navy transition-colors hover:bg-surface disabled:opacity-50"
+              className="flex items-center gap-1.5 rounded border border-line px-4 py-2 text-body-sm font-bold text-ink transition-colors hover:bg-soft disabled:opacity-50"
             >
               <Icon name="content_copy" size={18} /> Copy
             </button>
@@ -205,7 +205,7 @@ export default function ComposePanel({ lead, onDone, onToast }: ComposePanelProp
 
           <div className="flex items-center gap-4">
             <DatePicker label="T2 if no reply:" value={lead.next_touch_date} onChange={updateT2Date} />
-            <span className="flex items-center gap-1.5 rounded bg-surface px-2 py-1 text-body-sm text-navy">
+            <span className="flex items-center gap-1.5 rounded bg-soft px-2 py-1 text-body-sm text-ink">
               <span className="h-2 w-2 rounded-full bg-green" />
               <span className="font-semibold">Coordinator</span>
             </span>

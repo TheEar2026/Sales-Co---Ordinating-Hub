@@ -37,35 +37,35 @@ export default function HandoverModal({ lead, onClose, onSuccess, onError }: Han
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
-      <div className="w-full max-w-sm rounded-xl bg-white p-5 shadow-2xl">
+      <div className="w-full max-w-sm rounded-xl bg-card p-5 shadow-2xl">
         <div className="mb-1 flex items-center gap-2">
           <Icon name="notifications_active" size={20} className="text-amber" filled />
-          <h3 className="text-body-md font-bold text-navy">Hand this lead to Rus</h3>
+          <h3 className="text-body-md font-bold text-ink">Hand this lead to Rus</h3>
         </div>
-        <p className="mb-4 text-body-sm text-text-muted">
+        <p className="mb-4 text-body-sm text-muted">
           {lead.contact_name} · {lead.school_name}
         </p>
 
-        <label className="micro-label mb-1.5 block text-text-muted">
+        <label className="micro-label mb-1.5 block text-muted">
           Demo date/time if already booked
         </label>
         <input
           type="datetime-local"
           value={demoDate}
           onChange={(e) => setDemoDate(e.target.value)}
-          className="mb-4 w-full rounded-lg border border-border bg-surface px-3 py-2 text-body-sm focus:outline-none focus:ring-2 focus:ring-gold"
+          className="mb-4 w-full rounded-lg border border-line bg-soft px-3 py-2 text-body-sm focus:outline-none focus:ring-2 focus:ring-gold"
         />
 
-        <label className="micro-label mb-1.5 block text-text-muted">Notes for Rus (optional)</label>
+        <label className="micro-label mb-1.5 block text-muted">Notes for Rus (optional)</label>
         <textarea
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
           rows={3}
-          className="mb-4 w-full rounded-lg border border-border bg-surface px-3 py-2 text-body-sm focus:outline-none focus:ring-2 focus:ring-gold"
+          className="mb-4 w-full rounded-lg border border-line bg-soft px-3 py-2 text-body-sm focus:outline-none focus:ring-2 focus:ring-gold"
         />
 
         <div className="flex justify-end gap-2">
-          <button onClick={onClose} className="rounded-lg px-4 py-2 text-body-sm font-bold text-text-muted">
+          <button onClick={onClose} className="rounded-lg px-4 py-2 text-body-sm font-bold text-muted">
             Cancel
           </button>
           <button

@@ -1,25 +1,33 @@
 /** @type {import('tailwindcss').Config} */
 export default {
   content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
+  darkMode: 'class',
   theme: {
     extend: {
       colors: {
+        // Themed semantic tokens (flip on .dark via CSS vars)
+        app: 'rgb(var(--c-app) / <alpha-value>)',
+        card: 'rgb(var(--c-card) / <alpha-value>)',
+        soft: 'rgb(var(--c-soft) / <alpha-value>)',
+        line: 'rgb(var(--c-line) / <alpha-value>)',
+        ink: 'rgb(var(--c-ink) / <alpha-value>)',
+        muted: 'rgb(var(--c-muted) / <alpha-value>)',
+        chrome: 'rgb(var(--c-chrome) / <alpha-value>)',
+        'gold-light': 'rgb(var(--c-gold-light) / <alpha-value>)',
+        'green-light': 'rgb(var(--c-green-light) / <alpha-value>)',
+        'amber-light': 'rgb(var(--c-amber-light) / <alpha-value>)',
+        'red-light': 'rgb(var(--c-red-light) / <alpha-value>)',
+        'email-bg': 'rgb(var(--c-email-bg) / <alpha-value>)',
+        'email-line': 'rgb(var(--c-email-line) / <alpha-value>)',
+        'email-ink': 'rgb(var(--c-email-ink) / <alpha-value>)',
+        // Fixed brand + semantic colors (work on both themes)
         navy: '#1F2D3D',
         gold: '#B8860B',
-        'gold-light': '#F5EFE0',
         'gold-mid': '#D4A017',
-        'brand-gold': '#9E814B',
+        'brand-gold': '#B8935A',
         green: '#2E7D4F',
-        'green-light': '#EAF3EC',
         red: '#B23A3A',
-        'red-light': '#FAF0F0',
         amber: '#C17F24',
-        'amber-light': '#FEF3E2',
-        'text-muted': '#6B7280',
-        border: '#E5E7EB',
-        surface: '#F8F9FA',
-        'on-surface': '#191C1D',
-        'on-surface-variant': '#44474C',
       },
       fontFamily: {
         sans: ['Inter', 'system-ui', 'Segoe UI', 'Roboto', 'sans-serif'],

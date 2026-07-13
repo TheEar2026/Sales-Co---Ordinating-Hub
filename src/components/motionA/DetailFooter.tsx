@@ -99,7 +99,7 @@ export default function DetailFooter({ lead, onUpdated }: DetailFooterProps) {
   }
 
   return (
-    <div className="border-t border-border bg-white px-4 py-3 shadow-[0_-4px_12px_rgba(0,0,0,0.03)]">
+    <div className="border-t border-line bg-card px-4 py-3 shadow-[0_-4px_12px_rgba(0,0,0,0.03)]">
       {noteOpen && (
         <div className="mb-3">
           <textarea
@@ -107,17 +107,17 @@ export default function DetailFooter({ lead, onUpdated }: DetailFooterProps) {
             onChange={(e) => setNoteText(e.target.value)}
             rows={3}
             placeholder="Add a note…"
-            className="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gold"
+            className="w-full rounded border border-line px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gold"
           />
           <div className="mt-1 flex gap-2">
             <button
               onClick={saveNote}
               disabled={busy}
-              className="rounded bg-navy px-3 py-1 text-xs font-medium text-white disabled:opacity-50"
+              className="rounded bg-chrome px-3 py-1 text-xs font-medium text-white disabled:opacity-50"
             >
               Save note
             </button>
-            <button onClick={() => setNoteOpen(false)} className="text-xs text-gray-500">
+            <button onClick={() => setNoteOpen(false)} className="text-xs text-muted">
               Cancel
             </button>
           </div>
@@ -126,13 +126,13 @@ export default function DetailFooter({ lead, onUpdated }: DetailFooterProps) {
 
       {replyModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
-          <div className="w-full max-w-sm rounded-lg bg-white p-5 shadow-xl">
-            <h3 className="mb-3 text-sm font-semibold text-navy">Log reply</h3>
-            <label className="mb-1 block text-xs font-medium text-gray-600">New status</label>
+          <div className="w-full max-w-sm rounded-lg bg-card p-5 shadow-xl">
+            <h3 className="mb-3 text-sm font-semibold text-ink">Log reply</h3>
+            <label className="mb-1 block text-xs font-medium text-muted">New status</label>
             <select
               value={replyStatus}
               onChange={(e) => setReplyStatus(e.target.value as LeadStatus)}
-              className="mb-3 w-full rounded border border-gray-300 px-2 py-1.5 text-sm"
+              className="mb-3 w-full rounded border border-line px-2 py-1.5 text-sm"
             >
               {REPLY_STATUS_OPTIONS.map((opt) => (
                 <option key={opt.value} value={opt.value}>
@@ -140,17 +140,17 @@ export default function DetailFooter({ lead, onUpdated }: DetailFooterProps) {
                 </option>
               ))}
             </select>
-            <label className="mb-1 block text-xs font-medium text-gray-600">What did they say?</label>
+            <label className="mb-1 block text-xs font-medium text-muted">What did they say?</label>
             <textarea
               value={replySummary}
               onChange={(e) => setReplySummary(e.target.value)}
               rows={3}
-              className="mb-3 w-full rounded border border-gray-300 px-3 py-2 text-sm"
+              className="mb-3 w-full rounded border border-line px-3 py-2 text-sm"
             />
             <div className="flex justify-end gap-2">
               <button
                 onClick={() => setReplyModalOpen(false)}
-                className="rounded px-3 py-1.5 text-sm text-gray-500"
+                className="rounded px-3 py-1.5 text-sm text-muted"
               >
                 Cancel
               </button>
@@ -185,7 +185,7 @@ export default function DetailFooter({ lead, onUpdated }: DetailFooterProps) {
           <button
             onClick={() => setNoteOpen(true)}
             disabled={busy}
-            className="flex items-center gap-1.5 rounded border border-border px-4 py-2 text-body-sm font-bold text-navy transition-colors hover:bg-surface disabled:opacity-50"
+            className="flex items-center gap-1.5 rounded border border-line px-4 py-2 text-body-sm font-bold text-ink transition-colors hover:bg-soft disabled:opacity-50"
           >
             <Icon name="edit_note" size={18} /> Log note
           </button>
@@ -198,7 +198,7 @@ export default function DetailFooter({ lead, onUpdated }: DetailFooterProps) {
             onChange={updateNextTouchDate}
             tooltip="Set based on what this contact needs — not a fixed interval."
           />
-          <span className="flex items-center gap-1.5 rounded bg-surface px-2 py-1 text-body-sm text-navy">
+          <span className="flex items-center gap-1.5 rounded bg-soft px-2 py-1 text-body-sm text-ink">
             <span className={`h-2 w-2 rounded-full ${lead.owner === 'rus' ? 'bg-gold-mid' : 'bg-green'}`} />
             <span className="font-semibold">{lead.owner === 'rus' ? 'Rus' : 'Coordinator'}</span>
           </span>

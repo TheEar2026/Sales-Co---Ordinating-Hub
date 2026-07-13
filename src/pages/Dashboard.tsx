@@ -85,7 +85,7 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="flex h-screen flex-col bg-gray-50">
+    <div className="flex h-screen flex-col bg-app">
       <TopBar onOpenTemplates={() => setTemplatesOpen(true)} />
       <ScoreStrip />
       <TabBar
@@ -116,7 +116,7 @@ export default function Dashboard() {
           {selectedALead ? (
             <LeadDetail lead={selectedALead} onUpdated={refetchA} />
           ) : (
-            <div className="flex flex-1 items-center justify-center bg-surface text-body-md text-text-muted">
+            <div className="flex flex-1 items-center justify-center bg-soft text-body-md text-muted">
               Select a lead to see details.
             </div>
           )}
@@ -139,7 +139,7 @@ export default function Dashboard() {
               onToast={(type, message) => setToast({ type, message })}
             />
           ) : (
-            <div className="flex flex-1 items-center justify-center bg-surface text-body-md text-text-muted">
+            <div className="flex flex-1 items-center justify-center bg-soft text-body-md text-muted">
               Select a lead from the queue.
             </div>
           )}

@@ -1,6 +1,8 @@
 import { format } from 'date-fns'
 import { useAuth } from '../../hooks/useAuth'
+import { useTheme } from '../../hooks/useTheme'
 import EarLogo from '../shared/EarLogo'
+import Icon from '../shared/Icon'
 
 const TERM_START_DATE = new Date('2026-07-13')
 
@@ -35,10 +37,11 @@ interface TopBarProps {
 
 export default function TopBar({ onOpenTemplates }: TopBarProps) {
   const { profile, signOut } = useAuth()
+  const { theme, toggle } = useTheme()
   const today = new Date()
 
   return (
-    <header className="flex h-[56px] items-center justify-between border-b-4 border-brand-gold bg-navy px-4 text-white">
+    <header className="flex h-[56px] items-center justify-between border-b-4 border-brand-gold bg-chrome px-4 text-white">
       <div className="flex items-center gap-3">
         <EarLogo className="h-8 w-auto text-gold-mid" />
         <span className="micro-label text-white/50">Sales</span>
@@ -62,6 +65,15 @@ export default function TopBar({ onOpenTemplates }: TopBarProps) {
             Templates
           </button>
         )}
+
+        <button
+          onClick={toggle}
+          title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+          aria-label="Toggle theme"
+          className="flex items-center justify-center rounded p-1.5 text-white/70 transition-colors hover:bg-white/10 hover:text-white"
+        >
+          <Icon name={theme === 'dark' ? 'light_mode' : 'dark_mode'} size={18} />
+        </button>
 
         <button
           onClick={signOut}

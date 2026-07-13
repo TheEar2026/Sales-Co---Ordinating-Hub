@@ -2,6 +2,46 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ------------------------------------------------------------------
+   Semantic theme tokens (RGB channels so Tailwind alpha modifiers work).
+   Light is the default; `.dark` on <html> flips to dark mode.
+   The chrome (top bar / primary buttons) is a clean black in both.
+------------------------------------------------------------------ */
+:root {
+  --c-app: 244 245 247;        /* page background */
+  --c-card: 255 255 255;       /* cards / panels */
+  --c-soft: 243 244 246;       /* inputs, headers, soft fills */
+  --c-line: 229 231 235;       /* borders / dividers */
+  --c-ink: 23 24 26;           /* primary text */
+  --c-muted: 107 114 128;      /* secondary text */
+  --c-chrome: 11 11 12;        /* top bar + primary buttons (clean black) */
+  --c-gold-light: 245 239 224;
+  --c-green-light: 234 243 236;
+  --c-amber-light: 254 243 226;
+  --c-red-light: 250 240 240;
+  --c-email-bg: 238 242 249;
+  --c-email-line: 199 210 229;
+  --c-email-ink: 58 72 89;
+}
+
+.dark {
+  color-scheme: dark;
+  --c-app: 10 10 11;           /* clean near-black */
+  --c-card: 22 22 24;
+  --c-soft: 31 31 35;
+  --c-line: 42 42 46;
+  --c-ink: 234 234 236;
+  --c-muted: 156 163 175;
+  --c-chrome: 0 0 0;           /* pure black */
+  --c-gold-light: 42 36 22;
+  --c-green-light: 20 38 27;
+  --c-amber-light: 38 29 16;
+  --c-red-light: 38 20 22;
+  --c-email-bg: 20 32 58;
+  --c-email-line: 38 66 112;
+  --c-email-ink: 157 180 222;
+}
+
 body {
   margin: 0;
   font-family: 'Inter', system-ui, 'Segoe UI', Roboto, sans-serif;

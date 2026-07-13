@@ -1,7 +1,7 @@
 import type { LeadStatus } from '../../types'
 
 const STATUS_STYLES: Record<LeadStatus, string> = {
-  untouched: 'bg-gray-100 text-text-muted',
+  untouched: 'bg-soft text-muted',
   't1-sent': 'bg-gold-light text-gold',
   't2-sent': 'bg-gold-light text-gold',
   't3-sent': 'bg-gold-light text-gold',
@@ -13,7 +13,7 @@ const STATUS_STYLES: Record<LeadStatus, string> = {
   close: 'bg-green-light text-green',
   won: 'bg-green-light text-green',
   lost: 'bg-red-light text-red',
-  parked: 'bg-gray-100 text-text-muted',
+  parked: 'bg-soft text-muted',
   declined: 'bg-red-light text-red',
   blocked: 'bg-red-light text-red',
 }

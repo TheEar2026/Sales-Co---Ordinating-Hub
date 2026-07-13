@@ -18,12 +18,12 @@ interface MetricProps {
   sub?: string
 }
 
-function Metric({ label, value, valueClass = 'text-navy', sub }: MetricProps) {
+function Metric({ label, value, valueClass = 'text-ink', sub }: MetricProps) {
   return (
     <div className="px-6 first:pl-0">
-      <p className="micro-label mb-1 text-text-muted">{label}</p>
+      <p className="micro-label mb-1 text-muted">{label}</p>
       <p className={`text-metric-xl tabular-nums ${valueClass}`}>{value}</p>
-      {sub && <p className="mt-0.5 text-[11px] text-text-muted">{sub}</p>}
+      {sub && <p className="mt-0.5 text-[11px] text-muted">{sub}</p>}
     </div>
   )
 }
@@ -32,15 +32,15 @@ export default function ScoreStrip() {
   const { scorecard, loading } = useScorecard()
 
   if (loading && !scorecard) {
-    return <div className="h-16 border-b border-border bg-white" />
+    return <div className="h-16 border-b border-line bg-card" />
   }
   if (!scorecard) return null
 
   const progressPct = Math.min(100, (scorecard.paying_schools / YEAR_TARGET) * 100)
 
   return (
-    <section className="flex items-center justify-between border-b border-border bg-white px-4 py-2">
-      <div className="flex divide-x divide-border">
+    <section className="flex items-center justify-between border-b border-line bg-card px-4 py-2">
+      <div className="flex divide-x divide-line">
         <Metric
           label="Paying schools"
           value={scorecard.paying_schools}
@@ -60,10 +60,10 @@ export default function ScoreStrip() {
           sub="placed"
         />
         <div className="flex flex-col justify-center px-6">
-          <p className="micro-label mb-1.5 text-text-muted">
+          <p className="micro-label mb-1.5 text-muted">
             Year progress · {scorecard.paying_schools}/{YEAR_TARGET}
           </p>
-          <div className="h-1.5 w-40 rounded-full bg-gray-100">
+          <div className="h-1.5 w-40 rounded-full bg-soft">
             <div className="h-1.5 rounded-full bg-green" style={{ width: `${progressPct}%` }} />
           </div>
         </div>
@@ -72,8 +72,8 @@ export default function ScoreStrip() {
       <div className="flex items-center gap-2">
         <Icon name="analytics" className="text-brand-gold" filled size={22} />
         <div className="flex flex-col leading-tight">
-          <span className="text-body-sm font-bold text-navy">Scorecard</span>
-          <span className="font-mono text-[10px] text-text-muted">Live</span>
+          <span className="text-body-sm font-bold text-ink">Scorecard</span>
+          <span className="font-mono text-[10px] text-muted">Live</span>
         </div>
       </div>
     </section>

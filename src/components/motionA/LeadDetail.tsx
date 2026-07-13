@@ -43,20 +43,20 @@ export default function LeadDetail({ lead, onUpdated }: LeadDetailProps) {
   }
 
   return (
-    <article className="flex flex-1 flex-col overflow-hidden bg-white">
+    <article className="flex flex-1 flex-col overflow-hidden bg-card">
       <div className="flex-1 overflow-y-auto">
         {/* header */}
-        <section className="border-b border-border px-8 py-6">
-          <h1 className="text-headline-lg text-navy">{lead.contact_name}</h1>
-          <p className="mt-1 text-body-md text-text-muted">
+        <section className="border-b border-line px-8 py-6">
+          <h1 className="text-headline-lg text-ink">{lead.contact_name}</h1>
+          <p className="mt-1 text-body-md text-muted">
             {lead.contact_role && <>{lead.contact_role} · </>}
             <span className="font-semibold text-brand-gold">{lead.school_name}</span>
           </p>
           <div className="mt-3 flex flex-wrap items-center gap-2">
             <StatusChip status={lead.status} />
             <TierBadge tier={lead.tier} />
-            <span className="font-mono text-[13px] text-text-muted">{formatZAR(lead.ac_deal_value)}</span>
-            <span className="font-mono text-[13px] text-text-muted">
+            <span className="font-mono text-[13px] text-muted">{formatZAR(lead.ac_deal_value)}</span>
+            <span className="font-mono text-[13px] text-muted">
               {lead.days_since_last_touch != null ? `${lead.days_since_last_touch}d silent` : 'no touch'}
             </span>
           </div>
@@ -75,26 +75,26 @@ export default function LeadDetail({ lead, onUpdated }: LeadDetailProps) {
               onBlur={saveNextAction}
               rows={2}
               placeholder="What's the next step for this contact?"
-              className="w-full resize-none border-none bg-transparent text-[18px] leading-snug text-navy placeholder:text-brand-gold/50 focus:outline-none"
+              className="w-full resize-none border-none bg-transparent text-[18px] leading-snug text-ink placeholder:text-brand-gold/50 focus:outline-none"
             />
           </div>
 
           {/* Notes */}
           <div>
-            <h3 className="micro-label mb-3 text-text-muted">Internal notes</h3>
+            <h3 className="micro-label mb-3 text-muted">Internal notes</h3>
             <textarea
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               onBlur={saveNotes}
               rows={5}
               placeholder="Full running notes for this contact…"
-              className="w-full rounded-lg border border-border bg-surface p-4 text-body-md leading-relaxed text-on-surface focus:outline-none focus:ring-2 focus:ring-gold"
+              className="w-full rounded-lg border border-line bg-soft p-4 text-body-md leading-relaxed text-ink focus:outline-none focus:ring-2 focus:ring-gold"
             />
           </div>
 
           {/* Touch history */}
           <div>
-            <h3 className="micro-label mb-4 text-text-muted">Touch history</h3>
+            <h3 className="micro-label mb-4 text-muted">Touch history</h3>
             <TouchHistory leadId={lead.id} />
           </div>
         </section>

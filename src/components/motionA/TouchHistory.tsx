@@ -39,7 +39,7 @@ export default function TouchHistory({ leadId }: { leadId: string }) {
   if (loading) return <LoadingSpinner label="Loading touch history…" />
 
   if (touches.length === 0) {
-    return <p className="text-body-sm text-text-muted">No touches logged yet.</p>
+    return <p className="text-body-sm text-muted">No touches logged yet.</p>
   }
 
   return (
@@ -47,7 +47,7 @@ export default function TouchHistory({ leadId }: { leadId: string }) {
       {touches.map((touch) => (
         <li
           key={touch.id}
-          className="flex items-center gap-3 rounded-lg border border-border bg-surface px-3 py-2.5"
+          className="flex items-center gap-3 rounded-lg border border-line bg-soft px-3 py-2.5"
         >
           <div
             className={`flex h-9 w-9 shrink-0 items-center justify-center rounded ${
@@ -58,19 +58,19 @@ export default function TouchHistory({ leadId }: { leadId: string }) {
           </div>
           <div className="min-w-0 flex-1">
             <div className="flex items-center justify-between">
-              <span className="text-body-sm font-bold text-navy">
+              <span className="text-body-sm font-bold text-ink">
                 {touch.touch_number}
-                <span className="ml-2 font-normal text-text-muted">
+                <span className="ml-2 font-normal text-muted">
                   {touch.sent_by === 'rus' ? 'Rus' : 'Coordinator'} · {touch.channel}
                   {touch.replied && ' · replied'}
                 </span>
               </span>
-              <span className="font-mono text-[11px] text-text-muted">
+              <span className="font-mono text-[11px] text-muted">
                 {format(new Date(touch.sent_date), 'd MMM yyyy')}
               </span>
             </div>
             {touch.reply_summary && (
-              <p className="mt-0.5 text-body-sm text-on-surface-variant">{touch.reply_summary}</p>
+              <p className="mt-0.5 text-body-sm text-muted">{touch.reply_summary}</p>
             )}
           </div>
         </li>

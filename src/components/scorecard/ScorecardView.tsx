@@ -38,21 +38,21 @@ function MotionBProgressTable() {
   if (!counts) return <LoadingSpinner label="Loading Motion B progress…" />
 
   return (
-    <div className="overflow-hidden rounded-lg border border-border">
+    <div className="overflow-hidden rounded-lg border border-line">
       <table className="w-full text-body-sm">
-        <thead className="bg-surface">
+        <thead className="bg-soft">
           <tr>
             {POOL_STATUSES.map((s) => (
-              <th key={s.status} className="micro-label px-3 py-2 text-left text-text-muted">
+              <th key={s.status} className="micro-label px-3 py-2 text-left text-muted">
                 {s.label}
               </th>
             ))}
           </tr>
         </thead>
         <tbody>
-          <tr className="border-t border-border">
+          <tr className="border-t border-line">
             {POOL_STATUSES.map((s) => (
-              <td key={s.status} className="px-3 py-2 text-metric-xl tabular-nums text-navy">
+              <td key={s.status} className="px-3 py-2 text-metric-xl tabular-nums text-ink">
                 {counts[s.status] ?? 0}
               </td>
             ))}
@@ -72,7 +72,7 @@ export default function ScorecardView() {
   if (!scorecard) return null
 
   return (
-    <div className="flex-1 overflow-y-auto bg-surface px-6 py-6">
+    <div className="flex-1 overflow-y-auto bg-soft px-6 py-6">
       <div className="mb-8 grid grid-cols-3 gap-4">
         <MetricCard
           label="Paying schools"
@@ -97,12 +97,12 @@ export default function ScorecardView() {
       </div>
 
       <div className="mb-8">
-        <h3 className="micro-label mb-3 text-navy">CLOSE tier — Rus priority list</h3>
+        <h3 className="micro-label mb-3 text-ink">CLOSE tier — Rus priority list</h3>
         <CloseList />
       </div>
 
       <div>
-        <h3 className="micro-label mb-3 text-navy">Motion B — pool progress</h3>
+        <h3 className="micro-label mb-3 text-ink">Motion B — pool progress</h3>
         <MotionBProgressTable />
       </div>
     </div>

@@ -23,6 +23,8 @@ import {
   ClipboardCheck,
   Video,
   Hourglass,
+  Sun,
+  Moon,
   type LucideIcon,
 } from 'lucide-react'
 
@@ -53,6 +55,8 @@ const ICONS: Record<string, LucideIcon> = {
   assignment_turned_in: ClipboardCheck,
   videocam: Video,
   hourglass_empty: Hourglass,
+  light_mode: Sun,
+  dark_mode: Moon,
 }
 
 interface IconProps {

@@ -67,11 +67,11 @@ export default function TemplateEditor({ onClose }: { onClose: () => void }) {
 
   return (
     <div className="fixed inset-0 z-50 flex bg-black/30">
-      <div className="m-auto flex h-[85vh] w-[90vw] max-w-5xl overflow-hidden rounded-xl bg-white shadow-2xl">
-        <div className="flex w-72 shrink-0 flex-col overflow-y-auto border-r border-border">
-          <div className="flex items-center justify-between border-b border-border px-4 py-3">
-            <h2 className="text-body-md font-bold text-navy">Templates</h2>
-            <button onClick={onClose} className="text-text-muted hover:text-navy">
+      <div className="m-auto flex h-[85vh] w-[90vw] max-w-5xl overflow-hidden rounded-xl bg-card shadow-2xl">
+        <div className="flex w-72 shrink-0 flex-col overflow-y-auto border-r border-line">
+          <div className="flex items-center justify-between border-b border-line px-4 py-3">
+            <h2 className="text-body-md font-bold text-ink">Templates</h2>
+            <button onClick={onClose} className="text-muted hover:text-ink">
               ✕
             </button>
           </div>
@@ -83,28 +83,28 @@ export default function TemplateEditor({ onClose }: { onClose: () => void }) {
               const group = templates.filter((t) => t.persona === persona)
               if (group.length === 0) return null
               return (
-                <div key={persona} className="border-b border-border/60 px-3 py-2">
-                  <div className="micro-label mb-1 text-text-muted">{persona}</div>
+                <div key={persona} className="border-b border-line/60 px-3 py-2">
+                  <div className="micro-label mb-1 text-muted">{persona}</div>
                   {group.map((t) => (
                     <div
                       key={t.id}
                       className={`mb-1 flex items-center justify-between rounded px-2 py-1.5 text-sm ${
-                        selected?.id === t.id ? 'bg-gold-light' : 'hover:bg-gray-50'
+                        selected?.id === t.id ? 'bg-gold-light' : 'hover:bg-app'
                       }`}
                     >
                       <button onClick={() => selectTemplate(t)} className="min-w-0 flex-1 truncate text-left">
-                        <span className="mr-1 text-xs text-gray-400">{t.touch_number}</span>
+                        <span className="mr-1 text-xs text-muted">{t.touch_number}</span>
                         {t.name}
                       </button>
                       <button
                         onClick={() => toggleActive(t)}
                         className={`ml-2 h-4 w-8 shrink-0 rounded-full transition-colors ${
-                          t.is_active ? 'bg-green' : 'bg-gray-300'
+                          t.is_active ? 'bg-green' : 'bg-line'
                         }`}
                         title={t.is_active ? 'Active — click to deactivate' : 'Inactive — click to activate'}
                       >
                         <span
-                          className={`block h-3.5 w-3.5 rounded-full bg-white transition-transform ${
+                          className={`block h-3.5 w-3.5 rounded-full bg-card transition-transform ${
                             t.is_active ? 'translate-x-4' : 'translate-x-0.5'
                           }`}
                         />
@@ -119,39 +119,39 @@ export default function TemplateEditor({ onClose }: { onClose: () => void }) {
 
         <div className="flex flex-1 flex-col overflow-y-auto p-5">
           {!selected || !editor ? (
-            <div className="flex flex-1 items-center justify-center text-sm text-gray-400">
+            <div className="flex flex-1 items-center justify-center text-sm text-muted">
               Select a template to edit.
             </div>
           ) : previewing ? (
             <div className="flex-1">
               <div className="mb-3 flex items-center justify-between">
-                <h3 className="text-sm font-semibold text-navy">Preview — sample data</h3>
-                <button onClick={() => setPreviewing(false)} className="text-xs text-gray-500 underline">
+                <h3 className="text-sm font-semibold text-ink">Preview — sample data</h3>
+                <button onClick={() => setPreviewing(false)} className="text-xs text-muted underline">
                   Back to edit
                 </button>
               </div>
-              <div className="mb-2 text-sm font-medium text-navy">{previewMerge(editor.subject)}</div>
-              <div className="whitespace-pre-wrap rounded border border-gray-200 p-4 text-sm text-gray-700">
+              <div className="mb-2 text-sm font-medium text-ink">{previewMerge(editor.subject)}</div>
+              <div className="whitespace-pre-wrap rounded border border-line p-4 text-sm text-ink">
                 {previewMerge(editor.body)}
               </div>
             </div>
           ) : (
             <div className="flex-1">
-              <label className="micro-label mb-1.5 block text-text-muted">Subject line</label>
+              <label className="micro-label mb-1.5 block text-muted">Subject line</label>
               <input
                 value={editor.subject}
                 onChange={(e) => setEditor({ ...editor, subject: e.target.value })}
-                className="mb-4 w-full rounded-lg border border-border bg-surface px-3 py-2 text-body-md focus:outline-none focus:ring-2 focus:ring-gold"
+                className="mb-4 w-full rounded-lg border border-line bg-soft px-3 py-2 text-body-md focus:outline-none focus:ring-2 focus:ring-gold"
               />
 
-              <label className="micro-label mb-1.5 block text-text-muted">Email body</label>
+              <label className="micro-label mb-1.5 block text-muted">Email body</label>
               <textarea
                 value={editor.body}
                 onChange={(e) => setEditor({ ...editor, body: e.target.value })}
                 rows={16}
-                className="w-full rounded-lg border border-border bg-surface px-3 py-2 font-mono text-[13px] leading-relaxed focus:outline-none focus:ring-2 focus:ring-gold"
+                className="w-full rounded-lg border border-line bg-soft px-3 py-2 font-mono text-[13px] leading-relaxed focus:outline-none focus:ring-2 focus:ring-gold"
               />
-              <p className="mt-2 text-body-sm text-text-muted">
+              <p className="mt-2 text-body-sm text-muted">
                 Merge fields: {'{{first_name}}'}, {'{{school_name}}'}, {'{{contact_role}}'}
               </p>
 
@@ -159,13 +159,13 @@ export default function TemplateEditor({ onClose }: { onClose: () => void }) {
                 <button
                   onClick={save}
                   disabled={saving}
-                  className="rounded-lg bg-navy px-4 py-2 text-body-sm font-bold text-white disabled:opacity-50"
+                  className="rounded-lg bg-chrome px-4 py-2 text-body-sm font-bold text-white disabled:opacity-50"
                 >
                   Save
                 </button>
                 <button
                   onClick={() => setPreviewing(true)}
-                  className="rounded-lg border border-border px-4 py-2 text-body-sm font-bold text-navy hover:bg-surface"
+                  className="rounded-lg border border-line px-4 py-2 text-body-sm font-bold text-ink hover:bg-soft"
                 >
                   Preview
                 </button>

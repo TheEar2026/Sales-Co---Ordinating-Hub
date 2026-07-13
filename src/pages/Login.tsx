@@ -21,20 +21,20 @@ export default function Login() {
   }
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-navy p-4">
-      {/* atmospheric depth */}
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-black p-4">
+      {/* atmospheric depth — clean black with a faint gold glow */}
       <div className="pointer-events-none fixed inset-0 -z-10">
-        <div className="absolute inset-0 bg-gradient-to-tr from-navy via-transparent to-[#0e1d2c] opacity-40" />
-        <div className="absolute -bottom-24 -left-24 h-96 w-96 rounded-full bg-brand-gold/5 blur-3xl" />
-        <div className="absolute -right-24 -top-24 h-96 w-96 rounded-full bg-[#b9c8dc]/5 blur-3xl" />
+        <div className="absolute inset-0 bg-gradient-to-tr from-black via-[#0c0c0d] to-[#141414] opacity-70" />
+        <div className="absolute -bottom-24 -left-24 h-96 w-96 rounded-full bg-brand-gold/10 blur-3xl" />
+        <div className="absolute -right-24 -top-24 h-96 w-96 rounded-full bg-brand-gold/5 blur-3xl" />
       </div>
 
-      <div className="w-full max-w-[380px] overflow-hidden rounded-xl bg-white shadow-2xl">
+      <div className="w-full max-w-[380px] overflow-hidden rounded-xl bg-card shadow-2xl">
         <div className="px-8 pb-6 pt-10 text-center">
           <div className="mb-4 flex justify-center">
             <EarLogo className="h-12 w-auto text-[#9E814B]" />
           </div>
-          <p className="micro-label text-text-muted">Sales Dashboard</p>
+          <p className="micro-label text-muted">Sales Dashboard</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5 px-8 pb-8">
@@ -47,11 +47,11 @@ export default function Login() {
           )}
 
           <div className="space-y-1.5">
-            <label htmlFor="email" className="micro-label block text-text-muted">
+            <label htmlFor="email" className="micro-label block text-muted">
               Email address
             </label>
             <div className="relative flex items-center">
-              <Icon name="mail" className="absolute left-3 text-text-muted" size={18} />
+              <Icon name="mail" className="absolute left-3 text-muted" size={18} />
               <input
                 id="email"
                 type="email"
@@ -60,17 +60,17 @@ export default function Login() {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@the-ear.com"
                 autoComplete="email"
-                className="w-full rounded-lg border border-border bg-surface py-2.5 pl-10 pr-4 text-body-md text-navy placeholder:text-text-muted/60 focus:outline-none focus:ring-2 focus:ring-gold"
+                className="w-full rounded-lg border border-line bg-soft py-2.5 pl-10 pr-4 text-body-md text-ink placeholder:text-muted/60 focus:outline-none focus:ring-2 focus:ring-gold"
               />
             </div>
           </div>
 
           <div className="space-y-1.5">
-            <label htmlFor="password" className="micro-label block text-text-muted">
+            <label htmlFor="password" className="micro-label block text-muted">
               Password
             </label>
             <div className="relative flex items-center">
-              <Icon name="lock" className="absolute left-3 text-text-muted" size={18} />
+              <Icon name="lock" className="absolute left-3 text-muted" size={18} />
               <input
                 id="password"
                 type="password"
@@ -79,7 +79,7 @@ export default function Login() {
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
                 autoComplete="current-password"
-                className="w-full rounded-lg border border-border bg-surface py-2.5 pl-10 pr-4 text-body-md text-navy placeholder:text-text-muted/60 focus:outline-none focus:ring-2 focus:ring-gold"
+                className="w-full rounded-lg border border-line bg-soft py-2.5 pl-10 pr-4 text-body-md text-ink placeholder:text-muted/60 focus:outline-none focus:ring-2 focus:ring-gold"
               />
             </div>
           </div>
@@ -89,7 +89,7 @@ export default function Login() {
           <button
             type="submit"
             disabled={submitting}
-            className="group flex w-full items-center justify-center gap-2 rounded-lg bg-navy py-3 font-bold text-white transition-all hover:bg-[#0e1d2c] active:scale-[0.98] disabled:opacity-50"
+            className="group flex w-full items-center justify-center gap-2 rounded-lg bg-chrome py-3 font-bold text-white transition-all hover:bg-[#0e1d2c] active:scale-[0.98] disabled:opacity-50"
           >
             {submitting ? (
               <>
