@@ -23,6 +23,22 @@ connected to a live Supabase project** — the credentials below are still
 pending from the CTO. Once they arrive, follow the steps under Setup and
 the app is ready to go.
 
+## Demo mode (try it without Supabase)
+
+To explore the full dashboard with realistic sample data and no backend:
+
+```bash
+cp .env.example .env   # then set VITE_DEMO_MODE=true
+npm install
+npm run dev
+```
+
+Log in as `rus@the-ear.com` or `coordinator@the-ear.com`, password `demo`.
+Everything works in-memory — the Motion B queue, template merge, the
+handover flow, real-time list updates, the scorecard, and the template
+editor. Data resets on page refresh. Demo mode is off unless
+`VITE_DEMO_MODE=true`, so production builds are unaffected.
+
 ## Setup
 
 1. **Create the schema.** In the Supabase SQL Editor, run, in order:
