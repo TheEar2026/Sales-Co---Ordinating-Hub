@@ -18,19 +18,24 @@ Realtime + Edge Functions), Resend for email, deployed on Vercel.
 
 ## Status
 
-**Live and verified against the production Supabase project**
-(`oowfsxjngaxzxdsdnpxr`). Done: schema + patch applied, both user
-accounts created, realtime enabled, `notify-handover` edge function
-deployed, database webhook trigger created, full workflow tested
-end-to-end in a browser against the live database.
+**Deployed and live: https://ear-academy-sales.vercel.app**
 
-Remaining before production use:
+Verified against the production Supabase project (`oowfsxjngaxzxdsdnpxr`).
+Done: schema + patch applied, both user accounts created, realtime
+enabled, `notify-handover` edge function deployed, database webhook
+trigger created, full workflow tested end-to-end against the live
+database, deployed to Vercel (`the-ear-academy` team) with production
+env vars set.
 
-1. Set the Resend key so handover emails send:
-   `supabase secrets set RESEND_API_KEY=<key>` (or Dashboard → Edge
-   Functions → Secrets). Confirm the-ear.com is verified in Resend.
-2. Deploy to Vercel (step 5 below).
-3. Migrate the 357 leads from `unified_leads.json` (see Data migration).
+Remaining before day-to-day use:
+
+1. **Migrate the 357 leads** from `unified_leads.json` — the live
+   database currently has both user accounts but no leads yet (see Data
+   migration below).
+2. **Resend key** (parked for now) — handover emails won't send until
+   `supabase secrets set RESEND_API_KEY=<key>` is run and the-ear.com is
+   confirmed verified in Resend. Everything else about the handover
+   works without it (lead reassignment, real-time sync).
 
 ## Demo mode (try it without Supabase)
 
