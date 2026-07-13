@@ -18,10 +18,19 @@ Realtime + Edge Functions), Resend for email, deployed on Vercel.
 
 ## Status
 
-The database schema, edge function, and this app are all built. **Not yet
-connected to a live Supabase project** — the credentials below are still
-pending from the CTO. Once they arrive, follow the steps under Setup and
-the app is ready to go.
+**Live and verified against the production Supabase project**
+(`oowfsxjngaxzxdsdnpxr`). Done: schema + patch applied, both user
+accounts created, realtime enabled, `notify-handover` edge function
+deployed, database webhook trigger created, full workflow tested
+end-to-end in a browser against the live database.
+
+Remaining before production use:
+
+1. Set the Resend key so handover emails send:
+   `supabase secrets set RESEND_API_KEY=<key>` (or Dashboard → Edge
+   Functions → Secrets). Confirm the-ear.com is verified in Resend.
+2. Deploy to Vercel (step 5 below).
+3. Migrate the 357 leads from `unified_leads.json` (see Data migration).
 
 ## Demo mode (try it without Supabase)
 
