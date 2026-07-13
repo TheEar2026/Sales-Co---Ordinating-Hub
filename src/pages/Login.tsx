@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react'
 import { useAuth } from '../hooks/useAuth'
 import { isDemoMode } from '../lib/supabase'
+import EarLogo from '../components/shared/EarLogo'
 
 export default function Login() {
   const { signIn } = useAuth()
@@ -21,8 +22,10 @@ export default function Login() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-navy">
       <div className="w-full max-w-sm bg-white rounded-lg shadow-lg p-8">
-        <h1 className="text-xl font-semibold text-navy mb-1">the ear academy</h1>
-        <p className="text-sm text-gray-500 mb-6">sales dashboard</p>
+        <EarLogo className="h-16 w-auto text-[#9E814B]" />
+        <p className="mt-3 mb-6 text-xs font-medium uppercase tracking-[0.2em] text-gray-400">
+          Sales dashboard
+        </p>
 
         {isDemoMode && (
           <div className="mb-4 rounded bg-amber-light px-3 py-2 text-xs text-amber">

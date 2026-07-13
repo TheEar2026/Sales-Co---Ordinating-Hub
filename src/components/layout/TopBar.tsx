@@ -1,5 +1,6 @@
 import { format } from 'date-fns'
 import { useAuth } from '../../hooks/useAuth'
+import EarLogo from '../shared/EarLogo'
 
 const TERM_START_DATE = new Date('2026-07-13')
 
@@ -39,7 +40,10 @@ export default function TopBar({ onOpenTemplates }: TopBarProps) {
   return (
     <header className="flex items-center justify-between border-b-[3px] border-gold bg-navy px-6 py-3 text-white">
       <div className="flex items-center gap-4">
-        <span className="text-sm font-semibold tracking-wide">the ear academy — sales</span>
+        <span className="flex items-center gap-2.5">
+          <EarLogo className="h-9 w-auto text-gold-mid" />
+          <span className="text-xs font-medium uppercase tracking-[0.2em] text-white/60">Sales</span>
+        </span>
         <span className="rounded bg-white/10 px-2 py-1 text-xs">
           {format(today, 'EEEE d MMMM yyyy')} · Term week {termWeek(today)}
         </span>
