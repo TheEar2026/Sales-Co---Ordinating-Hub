@@ -1,0 +1,179 @@
+import { useState } from 'react'
+import { supabase } from '../../lib/supabase'
+import { useAuth } from '../../hooks/useAuth'
+import { useTemplates } from '../../hooks/useTemplates'
+import type { PersonaCode, Template } from '../../types'
+import LoadingSpinner from '../shared/LoadingSpinner'
+
+const PERSONAS: PersonaCode[] = ['P1', 'P2', 'P3', 'P4', 'P5', 'P6']
+
+const SAMPLE_MERGE: Record<string, string> = {
+  first_name: 'Alex',
+  school_name: 'Riverside Primary',
+  contact_role: 'Head of Music',
+}
+
+function previewMerge(text: string): string {
+  return text.replace(/\{\{\s*(\w+)\s*\}\}/g, (match, field: string) => SAMPLE_MERGE[field] ?? match)
+}
+
+interface EditorState {
+  subject: string
+  body: string
+}
+
+export default function TemplateEditor({ onClose }: { onClose: () => void }) {
+  const { profile } = useAuth()
+  const { templates, loading, refetch } = useTemplates()
+  const [selected, setSelected] = useState<Template | null>(null)
+  const [editor, setEditor] = useState<EditorState | null>(null)
+  const [previewing, setPreviewing] = useState(false)
+  const [saving, setSaving] = useState(false)
+
+  function selectTemplate(template: Template) {
+    setSelected(template)
+    setEditor({ subject: template.subject, body: template.body })
+    setPreviewing(false)
+  }
+
+  async function save() {
+    if (!selected || !editor || !profile) return
+    setSaving(true)
+    await supabase
+      .from('templates')
+      .update({
+        subject: editor.subject,
+        body: editor.body,
+        version: selected.version + 1,
+        updated_by: profile.id,
+      })
+      .eq('id', selected.id)
+    setSaving(false)
+    await refetch()
+  }
+
+  async function toggleActive(template: Template) {
+    if (!template.is_active) {
+      await supabase
+        .from('templates')
+        .update({ is_active: false })
+        .eq('persona', template.persona)
+        .eq('touch_number', template.touch_number)
+        .eq('is_active', true)
+    }
+    await supabase.from('templates').update({ is_active: !template.is_active }).eq('id', template.id)
+    await refetch()
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex bg-black/30">
+      <div className="m-auto flex h-[85vh] w-[90vw] max-w-5xl overflow-hidden rounded-lg bg-white shadow-xl">
+        <div className="flex w-72 shrink-0 flex-col overflow-y-auto border-r border-gray-200">
+          <div className="flex items-center justify-between border-b border-gray-100 px-4 py-3">
+            <h2 className="text-sm font-semibold text-navy">Templates</h2>
+            <button onClick={onClose} className="text-sm text-gray-400 hover:text-gray-600">
+              ✕
+            </button>
+          </div>
+
+          {loading ? (
+            <LoadingSpinner label="Loading templates…" />
+          ) : (
+            PERSONAS.map((persona) => {
+              const group = templates.filter((t) => t.persona === persona)
+              if (group.length === 0) return null
+              return (
+                <div key={persona} className="border-b border-gray-50 px-3 py-2">
+                  <div className="mb-1 text-xs font-semibold uppercase tracking-wide text-gray-400">{persona}</div>
+                  {group.map((t) => (
+                    <div
+                      key={t.id}
+                      className={`mb-1 flex items-center justify-between rounded px-2 py-1.5 text-sm ${
+                        selected?.id === t.id ? 'bg-gold-light' : 'hover:bg-gray-50'
+                      }`}
+                    >
+                      <button onClick={() => selectTemplate(t)} className="min-w-0 flex-1 truncate text-left">
+                        <span className="mr-1 text-xs text-gray-400">{t.touch_number}</span>
+                        {t.name}
+                      </button>
+                      <button
+                        onClick={() => toggleActive(t)}
+                        className={`ml-2 h-4 w-8 shrink-0 rounded-full transition-colors ${
+                          t.is_active ? 'bg-green' : 'bg-gray-300'
+                        }`}
+                        title={t.is_active ? 'Active — click to deactivate' : 'Inactive — click to activate'}
+                      >
+                        <span
+                          className={`block h-3.5 w-3.5 rounded-full bg-white transition-transform ${
+                            t.is_active ? 'translate-x-4' : 'translate-x-0.5'
+                          }`}
+                        />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )
+            })
+          )}
+        </div>
+
+        <div className="flex flex-1 flex-col overflow-y-auto p-5">
+          {!selected || !editor ? (
+            <div className="flex flex-1 items-center justify-center text-sm text-gray-400">
+              Select a template to edit.
+            </div>
+          ) : previewing ? (
+            <div className="flex-1">
+              <div className="mb-3 flex items-center justify-between">
+                <h3 className="text-sm font-semibold text-navy">Preview — sample data</h3>
+                <button onClick={() => setPreviewing(false)} className="text-xs text-gray-500 underline">
+                  Back to edit
+                </button>
+              </div>
+              <div className="mb-2 text-sm font-medium text-navy">{previewMerge(editor.subject)}</div>
+              <div className="whitespace-pre-wrap rounded border border-gray-200 p-4 text-sm text-gray-700">
+                {previewMerge(editor.body)}
+              </div>
+            </div>
+          ) : (
+            <div className="flex-1">
+              <label className="mb-1 block text-xs font-medium text-gray-600">Subject</label>
+              <input
+                value={editor.subject}
+                onChange={(e) => setEditor({ ...editor, subject: e.target.value })}
+                className="mb-4 w-full rounded border border-gray-300 px-3 py-2 text-sm"
+              />
+
+              <label className="mb-1 block text-xs font-medium text-gray-600">Body</label>
+              <textarea
+                value={editor.body}
+                onChange={(e) => setEditor({ ...editor, body: e.target.value })}
+                rows={16}
+                className="w-full rounded border border-gray-300 px-3 py-2 font-mono text-sm"
+              />
+              <p className="mt-2 text-xs text-gray-400">
+                Merge fields: {'{{first_name}}'}, {'{{school_name}}'}, {'{{contact_role}}'}
+              </p>
+
+              <div className="mt-4 flex gap-2">
+                <button
+                  onClick={save}
+                  disabled={saving}
+                  className="rounded bg-navy px-4 py-1.5 text-sm font-medium text-white disabled:opacity-50"
+                >
+                  Save
+                </button>
+                <button
+                  onClick={() => setPreviewing(true)}
+                  className="rounded border border-gray-300 px-4 py-1.5 text-sm text-gray-600"
+                >
+                  Preview
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}
