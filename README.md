@@ -40,10 +40,14 @@ Remaining before day-to-day use:
    `supabase secrets set RESEND_API_KEY=<key>` is run and the-ear.com is
    confirmed verified in Resend. Everything else about the handover
    works without it (lead reassignment, real-time sync).
-3. **AC deal sync** — schema patch 2 + the `ac-deal-webhook` function
-   are written and ready; deploying the function, setting
-   `AC_WEBHOOK_SECRET`, and adding the webhook in ActiveCampaign itself
-   are still outstanding (see ActiveCampaign deal sync below).
+3. **AC deal sync** — done. Deployed, webhook added in ActiveCampaign,
+   and verified end-to-end against a real deal move (see ActiveCampaign
+   deal sync below).
+4. **Outlook reply detection** — code deployed and tested (auth gate,
+   the case-insensitive matching function), but can't reach Outlook or
+   run on a schedule yet — needs an Azure AD app registration with
+   Graph `Mail.Read` **application** permission, which only your
+   organisation can create (see Outlook reply detection below).
 
 ## Demo mode (try it without Supabase)
 
@@ -71,6 +75,9 @@ editor. Data resets on page refresh. Demo mode is off unless
    - `supabase_schema_patch_2.sql` — adds the `webhook_log` audit table,
      `leads.needs_review` / `review_reason` / `ac_deal_currency`, and
      extends the `scorecard` view. Required for the AC deal sync below.
+   - `supabase_schema_patch_3.sql` — adds `app_config`, `outlook_reply_log`,
+     the `find_lead_by_email` lookup function, and enables `pg_cron` /
+     `pg_net`. Required for Outlook reply detection below.
 2. **Create the two users** in Supabase Auth → Users (Rus and the
    coordinator), then insert their rows into `public.users` with the
    matching `id`, `email`, `full_name`, and `role`.
@@ -110,14 +117,16 @@ within this pipeline, not a separate status field.
    - AC's webhook UI has no custom-header option, so the secret travels
      as a query parameter — the function checks it before doing anything
      else and returns 401 if it doesn't match.
-3. **How it decides what to update:** the function reads `deal.group`
-   (pipeline) and `deal.stage`, ignores anything outside pipeline 5, and
-   maps the stage to a lead `status`/`motion`/`owner`. It looks the lead
-   up by `ac_deal_id`; if none matches, it **creates** a new lead from
-   whatever contact/organization fields the webhook included and sets
-   `needs_review = true` so it surfaces as an amber flag on the card, in
-   the detail panel, and as a count on the Scorecard until someone
-   confirms it.
+3. **How it decides what to update:** the function reads `deal.pipelineid`
+   and `deal.stageid` (confirmed against a real webhook call — this
+   account sends "Deal Updated" events as JSON with these field names,
+   not the REST API's `group`/`stage` naming the spec assumed), ignores
+   anything outside pipeline 5, and maps the stage to a lead
+   `status`/`motion`/`owner`. It looks the lead up by `ac_deal_id`; if
+   none matches, it **creates** a new lead from whatever contact/deal
+   fields the webhook included and sets `needs_review = true` so it
+   surfaces as an amber flag on the card, in the detail panel, and as a
+   count on the Scorecard until someone confirms it.
 4. **Currency:** the Sales Conversion pipeline holds deals in more than
    one currency (ZAR, GBP, USD observed) — `ac_deal_value` is converted
    from AC's cents to whole units, and `ac_deal_currency` records which
@@ -126,6 +135,77 @@ within this pipeline, not a separate status field.
    is logged to `webhook_log` (deal id, pipeline, stage, resulting
    status, and the raw payload) so the sync can be debugged from the
    data alone.
+
+## Outlook reply detection
+
+Twice daily (08:00 and 18:00 SAST), a scan checks Rus's and the
+coordinator's Outlook inboxes for new mail and moves any lead that
+replies from `t1-sent` / `t2-sent` / `t3-sent` to `reply-received` —
+Badi never has to log a reply by hand. Deployed and tested (auth gate
+confirmed, RPC lookup confirmed against a real edge case — see below),
+**but not yet scheduled or able to reach Outlook**, both of which need
+one thing only your organisation can provide:
+
+**An Azure AD app registration with application (not delegated)
+permissions.** A normal "sign in with Microsoft" connection is tied to
+one person's session and can't read a *different* mailbox unattended —
+this needs a registration with Microsoft Graph **Mail.Read**
+(Application, not Delegated), admin-consented, with access to both
+`rus@the-ear.com` and the coordinator's mailbox.
+
+1. **Register the app** (Azure Portal → Entra ID → App registrations →
+   New registration → API permissions → Microsoft Graph → Application
+   permissions → `Mail.Read` → Grant admin consent). Create a client
+   secret under Certificates & secrets.
+2. **Set the remaining secrets:**
+   ```bash
+   supabase secrets set \
+     MICROSOFT_TENANT_ID=<tenant id> \
+     MICROSOFT_CLIENT_ID=<app client id> \
+     MICROSOFT_CLIENT_SECRET=<client secret value>
+   ```
+   (`RUS_EMAIL`, `BADI_EMAIL`, and `CRON_SECRET` are already set.)
+3. **Test manually** before scheduling anything:
+   ```bash
+   curl -X POST "https://<project-ref>.functions.supabase.co/outlook-reply-scan" \
+     -H "Authorization: Bearer <CRON_SECRET value>"
+   ```
+   Check the `outlook_reply_log` table for what it found (or
+   `app_config` for the `outlook_last_scan_at` watermark it set).
+4. **Enable the twice-daily schedule** — deliberately not run by the
+   schema patch, so a misconfigured integration doesn't generate
+   scheduled failures. Once step 3 succeeds:
+   ```sql
+   select cron.schedule(
+     'outlook-reply-scan-morning', '0 6 * * *',
+     $$select net.http_post(
+         url := 'https://<project-ref>.functions.supabase.co/outlook-reply-scan',
+         headers := jsonb_build_object('Authorization', 'Bearer <CRON_SECRET value>'),
+         body := '{}'::jsonb
+       );$$
+   );
+   select cron.schedule(
+     'outlook-reply-scan-evening', '0 16 * * *',
+     $$select net.http_post(
+         url := 'https://<project-ref>.functions.supabase.co/outlook-reply-scan',
+         headers := jsonb_build_object('Authorization', 'Bearer <CRON_SECRET value>'),
+         body := '{}'::jsonb
+       );$$
+   );
+   ```
+   (06:00 / 16:00 UTC = 08:00 / 18:00 SAST, UTC+2.)
+5. **Matching:** case-insensitive on `contact_email`, via a
+   `find_lead_by_email` SQL function rather than a client-side `ilike`
+   filter — `ilike` treats `_` as a wildcard, and `_` is a legal email
+   character, so an `ilike` match could silently match the *wrong*
+   lead. Verified against that exact scenario during testing.
+6. **What doesn't downgrade:** a lead already past `reply-received`
+   that gets another reply isn't moved backward — it's recorded in
+   `outlook_reply_log` as a `further_reply` with no status change.
+7. **What isn't logged:** unlike the AC sync, non-matching inbox mail
+   is skipped with no log entry at all, per spec — an inbox sees far
+   more unrelated mail than a deal webhook ever would, and logging
+   every miss would drown the table.
 
 ## Project layout
 
@@ -136,11 +216,13 @@ src/
   lib/          supabase client, handover RPC call, template merge
   pages/        Login, Dashboard
   types/        TypeScript types matching the Supabase schema
-supabase/functions/notify-handover/    Resend email edge function
-supabase/functions/ac-deal-webhook/    AC → Supabase deal-stage sync
+supabase/functions/notify-handover/     Resend email edge function
+supabase/functions/ac-deal-webhook/     AC → Supabase deal-stage sync
+supabase/functions/outlook-reply-scan/  Outlook → Supabase reply detection (scheduled)
 supabase_schema.sql                    full DB schema
-supabase_schema_patch.sql              additive patch (leads.next_action, realtime)
-supabase_schema_patch_2.sql            additive patch (webhook_log, needs_review, AC deal sync)
+supabase_schema_patch.sql               additive patch (leads.next_action, realtime)
+supabase_schema_patch_2.sql             additive patch (webhook_log, needs_review, AC deal sync)
+supabase_schema_patch_3.sql             additive patch (app_config, outlook_reply_log, pg_cron)
 ```
 
 ## End-to-end test (once live)
