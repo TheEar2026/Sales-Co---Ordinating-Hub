@@ -63,12 +63,20 @@ create policy "outlook_reply_log_read_all"
 --    email local-part character (e.g. john_doe@example.com), so an
 --    ilike match risks matching the WRONG lead. `lower() = lower()` has
 --    no such hazard.
-create or replace function find_lead_by_email(p_email text)
-returns leads as $$
+--
+--    Declared RETURNS SETOF leads, not a bare `returns leads` composite:
+--    a bare-composite SQL function whose internal query matches zero
+--    rows still returns ONE row with every field NULL (confirmed live
+--    against this project's PostgREST endpoint), which is a truthy
+--    object in JS and silently defeats a `if (!lead) continue` check
+--    on the caller side. SETOF makes a non-match a genuine empty array.
+drop function if exists find_lead_by_email(text);
+create function find_lead_by_email(p_email text)
+returns setof leads as $$
   select * from leads where lower(contact_email) = lower(p_email) limit 1;
 $$ language sql stable;
 
-comment on function find_lead_by_email is 'Case-insensitive lookup of a lead by contact_email. Returns null on no match. Used by the Outlook reply scan instead of an ilike filter to avoid `_`-wildcard false matches.';
+comment on function find_lead_by_email is 'Case-insensitive lookup of a lead by contact_email. Returns zero rows (empty result) on no match — declared SETOF so PostgREST serializes a non-match as [] rather than a truthy all-null object. Used by the Outlook reply scan instead of an ilike filter to avoid `_`-wildcard false matches.';
 
 
 -- 4. Extensions needed to schedule the scan twice daily.

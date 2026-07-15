@@ -160,11 +160,18 @@ async function processMailbox(
     const fromEmail = message.from?.emailAddress?.address;
     if (!fromEmail) continue;
 
-    const { data: lead, error } = await supabase.rpc("find_lead_by_email", { p_email: fromEmail });
+    // find_lead_by_email is declared RETURNS SETOF leads (not a bare
+    // composite) specifically so a non-match comes back as an empty
+    // array over PostgREST. A bare-composite RETURNS leads function
+    // still yields one row of all-NULL fields when its internal query
+    // matches nothing — an object that's truthy in JS — which silently
+    // defeated the `if (!lead) continue` check below.
+    const { data: leads, error } = await supabase.rpc("find_lead_by_email", { p_email: fromEmail });
     if (error) {
       console.error(`Lookup failed for ${fromEmail}:`, error);
       continue;
     }
+    const lead = leads?.[0];
     if (!lead) continue; // no matching lead — skip silently, per spec
 
     const today = new Date().toISOString().slice(0, 10);

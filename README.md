@@ -43,11 +43,11 @@ Remaining before day-to-day use:
 3. **AC deal sync** — done. Deployed, webhook added in ActiveCampaign,
    and verified end-to-end against a real deal move (see ActiveCampaign
    deal sync below).
-4. **Outlook reply detection** — code deployed and tested (auth gate,
-   the case-insensitive matching function), but can't reach Outlook or
-   run on a schedule yet — needs an Azure AD app registration with
-   Graph `Mail.Read` **application** permission, which only your
-   organisation can create (see Outlook reply detection below).
+4. **Outlook reply detection** — done. Azure AD app registered, deployed,
+   and verified end-to-end against real inbox mail (a genuine match
+   moved a lead from `t1-sent` to `reply-received`; non-matching mail
+   was correctly skipped with no log entry). Scheduled via `pg_cron` to
+   run twice daily (see Outlook reply detection below).
 
 ## Demo mode (try it without Supabase)
 
@@ -138,74 +138,68 @@ within this pipeline, not a separate status field.
 
 ## Outlook reply detection
 
-Twice daily (08:00 and 18:00 SAST), a scan checks Rus's and the
-coordinator's Outlook inboxes for new mail and moves any lead that
-replies from `t1-sent` / `t2-sent` / `t3-sent` to `reply-received` —
-Badi never has to log a reply by hand. Deployed and tested (auth gate
-confirmed, RPC lookup confirmed against a real edge case — see below),
-**but not yet scheduled or able to reach Outlook**, both of which need
-one thing only your organisation can provide:
+Twice daily (08:00 and 18:00 SAST, via `pg_cron`), a scan checks Rus's
+and the coordinator's Outlook inboxes for new mail and moves any lead
+that replies from `t1-sent` / `t2-sent` / `t3-sent` to `reply-received`
+— Badi never has to log a reply by hand. **Live and scheduled.**
 
-**An Azure AD app registration with application (not delegated)
-permissions.** A normal "sign in with Microsoft" connection is tied to
-one person's session and can't read a *different* mailbox unattended —
-this needs a registration with Microsoft Graph **Mail.Read**
-(Application, not Delegated), admin-consented, with access to both
-`rus@the-ear.com` and the coordinator's mailbox.
+Uses an Azure AD app registration with Microsoft Graph **Mail.Read**
+(Application, not Delegated) permission, admin-consented — a normal
+"sign in with Microsoft" connection is tied to one person's session and
+can't read a *different* mailbox unattended, so this needs app-only
+credentials with access to both `rus@the-ear.com` and the coordinator's
+mailbox instead.
 
-1. **Register the app** (Azure Portal → Entra ID → App registrations →
-   New registration → API permissions → Microsoft Graph → Application
-   permissions → `Mail.Read` → Grant admin consent). Create a client
-   secret under Certificates & secrets.
-2. **Set the remaining secrets:**
+1. **The app registration** already exists (Azure Portal → Entra ID →
+   App registrations → "Ear Academy Sales Sync"), with Microsoft Graph
+   Application permission `Mail.Read` granted admin consent, and a
+   client secret. If the secret ever needs rotating: Certificates &
+   secrets → New client secret → copy the **Value** (not the Secret
+   ID — Azure only shows the Value once) → re-run step 2 below.
+2. **Secrets set:**
    ```bash
    supabase secrets set \
      MICROSOFT_TENANT_ID=<tenant id> \
      MICROSOFT_CLIENT_ID=<app client id> \
      MICROSOFT_CLIENT_SECRET=<client secret value>
    ```
-   (`RUS_EMAIL`, `BADI_EMAIL`, and `CRON_SECRET` are already set.)
-3. **Test manually** before scheduling anything:
+   (`RUS_EMAIL`, `BADI_EMAIL`, and `CRON_SECRET` are also set.)
+3. **Manual test call**, if you ever need to trigger a scan outside the
+   schedule:
    ```bash
    curl -X POST "https://<project-ref>.functions.supabase.co/outlook-reply-scan" \
      -H "Authorization: Bearer <CRON_SECRET value>"
    ```
    Check the `outlook_reply_log` table for what it found (or
    `app_config` for the `outlook_last_scan_at` watermark it set).
-4. **Enable the twice-daily schedule** — deliberately not run by the
-   schema patch, so a misconfigured integration doesn't generate
-   scheduled failures. Once step 3 succeeds:
-   ```sql
-   select cron.schedule(
-     'outlook-reply-scan-morning', '0 6 * * *',
-     $$select net.http_post(
-         url := 'https://<project-ref>.functions.supabase.co/outlook-reply-scan',
-         headers := jsonb_build_object('Authorization', 'Bearer <CRON_SECRET value>'),
-         body := '{}'::jsonb
-       );$$
-   );
-   select cron.schedule(
-     'outlook-reply-scan-evening', '0 16 * * *',
-     $$select net.http_post(
-         url := 'https://<project-ref>.functions.supabase.co/outlook-reply-scan',
-         headers := jsonb_build_object('Authorization', 'Bearer <CRON_SECRET value>'),
-         body := '{}'::jsonb
-       );$$
-   );
-   ```
-   (06:00 / 16:00 UTC = 08:00 / 18:00 SAST, UTC+2.)
+4. **The twice-daily schedule** is registered via `pg_cron`
+   (`outlook-reply-scan-morning` at `0 6 * * *`,
+   `outlook-reply-scan-evening` at `0 16 * * *` — 06:00/16:00 UTC =
+   08:00/18:00 SAST), each firing `net.http_post` at the function with
+   the `CRON_SECRET` bearer token. Check `select * from cron.job;` and
+   `select * from cron.job_run_details order by start_time desc;` to
+   confirm runs are firing and succeeding.
 5. **Matching:** case-insensitive on `contact_email`, via a
    `find_lead_by_email` SQL function rather than a client-side `ilike`
    filter — `ilike` treats `_` as a wildcard, and `_` is a legal email
    character, so an `ilike` match could silently match the *wrong*
-   lead. Verified against that exact scenario during testing.
+   lead. The function is declared `returns setof leads`, not a bare
+   `returns leads` composite — a bare-composite SQL function whose
+   query matches zero rows still returns one row of all-NULL fields
+   over PostgREST (a real bug caught during live testing: every
+   non-matching inbox email was logged as a false "further_reply"
+   because that all-NULL object is truthy in JS). `setof` makes a
+   non-match a genuine empty array instead.
 6. **What doesn't downgrade:** a lead already past `reply-received`
    that gets another reply isn't moved backward — it's recorded in
    `outlook_reply_log` as a `further_reply` with no status change.
 7. **What isn't logged:** unlike the AC sync, non-matching inbox mail
    is skipped with no log entry at all, per spec — an inbox sees far
    more unrelated mail than a deal webhook ever would, and logging
-   every miss would drown the table.
+   every miss would drown the table. Verified live: a real match
+   (`brandon@the-ear.com`) logged exactly one `status_updated` row,
+   while ~15 other genuine inbox emails in the same window (PayPal,
+   GitHub, internal the-ear.com mail, etc.) produced zero log rows.
 
 ## Project layout
 
