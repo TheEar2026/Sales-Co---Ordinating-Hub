@@ -270,6 +270,19 @@ export const mockLeads: Lead[] = [
     last_touch_date: daysAgo(3),
     next_touch_date: daysAgo(-3),
   }),
+  // Auto-detected by the Outlook reply scan — status flipped straight
+  // to reply-received while still owned by the coordinator, awaiting
+  // her handover confirmation.
+  lead({
+    contact_name: 'Naledi Dube',
+    school_name: 'Fernwood High',
+    persona: 'P2',
+    status: 'reply-received',
+    touch_count: 2,
+    last_touch_date: daysAgo(1),
+    last_reply_date: daysAgo(0),
+    source: 'manual',
+  }),
   // Auto-created by the AC deal-sync webhook — no matching ac_deal_id
   // was found in Supabase, so it landed here flagged for review.
   lead({

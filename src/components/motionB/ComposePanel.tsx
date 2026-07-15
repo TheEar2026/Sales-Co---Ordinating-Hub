@@ -34,6 +34,7 @@ export default function ComposePanel({ lead, onDone, onToast }: ComposePanelProp
   const [busy, setBusy] = useState(false)
   const [handoverOpen, setHandoverOpen] = useState(false)
 
+  const hasReplied = lead.status === 'reply-received'
   const touchNumber = touchNumberForStatus(lead.status)
   const personaTemplates = useMemo(
     () => activeTemplatesForPersona(templates, lead.persona).filter((t) => t.touch_number === touchNumber),
@@ -110,7 +111,11 @@ export default function ComposePanel({ lead, onDone, onToast }: ComposePanelProp
             {lead.persona && (
               <span className="rounded bg-soft px-1.5 py-0.5 font-bold text-muted">{lead.persona}</span>
             )}
-            <span className="rounded bg-soft px-1.5 py-0.5 font-bold text-muted">{touchNumber}</span>
+            {hasReplied ? (
+              <span className="rounded bg-green/10 px-1.5 py-0.5 font-bold text-green">Replied</span>
+            ) : (
+              <span className="rounded bg-soft px-1.5 py-0.5 font-bold text-muted">{touchNumber}</span>
+            )}
             <span className="text-muted">Coordinator sends · hand off on reply</span>
           </div>
         </section>
@@ -120,50 +125,65 @@ export default function ComposePanel({ lead, onDone, onToast }: ComposePanelProp
             <NeedsReviewBanner leadId={lead.id} reason={lead.review_reason} onDismissed={() => {}} />
           )}
 
-          {/* email draft */}
-          <div className="overflow-hidden rounded-lg border border-email-line">
-            <div className="flex items-center justify-between bg-email-bg px-4 py-2">
-              <span className="micro-label flex items-center gap-1.5 text-email-ink">
-                <Icon name="draft" size={16} /> Email draft
-              </span>
-              {allPersonaTemplates.length > 1 && (
-                <select
-                  value={selectedTemplateId ?? ''}
-                  onChange={(e) => setSelectedTemplateId(e.target.value)}
-                  className="rounded border border-email-line bg-card px-2 py-1 text-xs"
-                >
-                  {allPersonaTemplates.map((t) => (
-                    <option key={t.id} value={t.id}>
-                      {t.name}
-                    </option>
-                  ))}
-                </select>
-              )}
+          {hasReplied ? (
+            /* reply already detected (Outlook auto-detection, or noticed manually) — nothing left
+               to draft, this lead is just waiting on the handover confirmation below */
+            <div className="flex gap-2 rounded-lg bg-green/10 px-4 py-3 text-body-sm text-green">
+              <Icon name="reply" size={18} className="mt-0.5 shrink-0" filled />
+              <p>
+                {lead.contact_name} has replied
+                {lead.last_reply_date ? ` (last reply ${lead.last_reply_date})` : ''}. Confirm the handover below
+                to send this lead to Rus — do not send another touch.
+              </p>
             </div>
-            <div className="px-4 py-3">
-              {selectedTemplate ? (
-                <>
-                  <div className="mb-2 text-body-md font-semibold text-ink">{mergedSubject}</div>
-                  <div className="whitespace-pre-wrap font-mono text-[13px] leading-relaxed text-muted">
-                    {mergedBody}
-                  </div>
-                </>
-              ) : (
-                <p className="text-body-sm text-muted">
-                  No active template for this persona/touch combination.
-                </p>
-              )}
-            </div>
-          </div>
+          ) : (
+            <>
+              {/* email draft */}
+              <div className="overflow-hidden rounded-lg border border-email-line">
+                <div className="flex items-center justify-between bg-email-bg px-4 py-2">
+                  <span className="micro-label flex items-center gap-1.5 text-email-ink">
+                    <Icon name="draft" size={16} /> Email draft
+                  </span>
+                  {allPersonaTemplates.length > 1 && (
+                    <select
+                      value={selectedTemplateId ?? ''}
+                      onChange={(e) => setSelectedTemplateId(e.target.value)}
+                      className="rounded border border-email-line bg-card px-2 py-1 text-xs"
+                    >
+                      {allPersonaTemplates.map((t) => (
+                        <option key={t.id} value={t.id}>
+                          {t.name}
+                        </option>
+                      ))}
+                    </select>
+                  )}
+                </div>
+                <div className="px-4 py-3">
+                  {selectedTemplate ? (
+                    <>
+                      <div className="mb-2 text-body-md font-semibold text-ink">{mergedSubject}</div>
+                      <div className="whitespace-pre-wrap font-mono text-[13px] leading-relaxed text-muted">
+                        {mergedBody}
+                      </div>
+                    </>
+                  ) : (
+                    <p className="text-body-sm text-muted">
+                      No active template for this persona/touch combination.
+                    </p>
+                  )}
+                </div>
+              </div>
 
-          {/* handover rule */}
-          <div className="flex gap-2 rounded-lg bg-amber-light px-4 py-3 text-body-sm text-amber">
-            <Icon name="notifications_active" size={18} className="mt-0.5 shrink-0" filled />
-            <p>
-              If {lead.contact_name} replies with genuine interest — a pricing question, a demo request, or they
-              offer a time to talk — use the button below. Do not continue the conversation yourself.
-            </p>
-          </div>
+              {/* handover rule */}
+              <div className="flex gap-2 rounded-lg bg-amber-light px-4 py-3 text-body-sm text-amber">
+                <Icon name="notifications_active" size={18} className="mt-0.5 shrink-0" filled />
+                <p>
+                  If {lead.contact_name} replies with genuine interest — a pricing question, a demo request, or
+                  they offer a time to talk — use the button below. Do not continue the conversation yourself.
+                </p>
+              </div>
+            </>
+          )}
 
           {/* school context */}
           <div>
@@ -178,13 +198,15 @@ export default function ComposePanel({ lead, onDone, onToast }: ComposePanelProp
       <footer className="border-t border-line bg-card px-4 py-3 shadow-[0_-4px_12px_rgba(0,0,0,0.03)]">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex flex-wrap items-center gap-2">
-            <button
-              onClick={markSent}
-              disabled={busy || !selectedTemplate}
-              className="flex items-center gap-1.5 rounded bg-green px-4 py-2 text-body-sm font-bold text-white transition-opacity hover:opacity-90 disabled:opacity-50"
-            >
-              <Icon name="check_circle" size={18} /> Sent — mark done
-            </button>
+            {!hasReplied && (
+              <button
+                onClick={markSent}
+                disabled={busy || !selectedTemplate}
+                className="flex items-center gap-1.5 rounded bg-green px-4 py-2 text-body-sm font-bold text-white transition-opacity hover:opacity-90 disabled:opacity-50"
+              >
+                <Icon name="check_circle" size={18} /> Sent — mark done
+              </button>
+            )}
             <button
               onClick={() => setHandoverOpen(true)}
               disabled={busy}
@@ -199,17 +221,21 @@ export default function ComposePanel({ lead, onDone, onToast }: ComposePanelProp
             >
               <Icon name="pause_circle" size={18} /> Park
             </button>
-            <button
-              onClick={editInOutlook}
-              disabled={!selectedTemplate}
-              className="flex items-center gap-1.5 rounded border border-line px-4 py-2 text-body-sm font-bold text-ink transition-colors hover:bg-soft disabled:opacity-50"
-            >
-              <Icon name="content_copy" size={18} /> Copy
-            </button>
+            {!hasReplied && (
+              <button
+                onClick={editInOutlook}
+                disabled={!selectedTemplate}
+                className="flex items-center gap-1.5 rounded border border-line px-4 py-2 text-body-sm font-bold text-ink transition-colors hover:bg-soft disabled:opacity-50"
+              >
+                <Icon name="content_copy" size={18} /> Copy
+              </button>
+            )}
           </div>
 
           <div className="flex items-center gap-4">
-            <DatePicker label="T2 if no reply:" value={lead.next_touch_date} onChange={updateT2Date} />
+            {!hasReplied && (
+              <DatePicker label="T2 if no reply:" value={lead.next_touch_date} onChange={updateT2Date} />
+            )}
             <span className="flex items-center gap-1.5 rounded bg-soft px-2 py-1 text-body-sm text-ink">
               <span className="h-2 w-2 rounded-full bg-green" />
               <span className="font-semibold">Coordinator</span>

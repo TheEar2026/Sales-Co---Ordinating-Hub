@@ -84,6 +84,7 @@ function motionADaily(): Row[] {
 
 function motionBDaily(): Row[] {
   const order = (l: Lead): number => {
+    if (l.status === 'reply-received') return 0
     if (l.status === 'untouched') return 1
     if (l.status === 't1-sent') return 2
     if (l.status === 't2-sent') return 3
@@ -95,8 +96,9 @@ function motionBDaily(): Row[] {
       (l) =>
         l.motion === 'B' &&
         l.owner === 'coordinator' &&
-        ['untouched', 't1-sent', 't2-sent'].includes(l.status) &&
-        (l.status === 'untouched' || (l.next_touch_date != null && l.next_touch_date <= today)),
+        ['untouched', 't1-sent', 't2-sent', 'reply-received'].includes(l.status) &&
+        (['untouched', 'reply-received'].includes(l.status) ||
+          (l.next_touch_date != null && l.next_touch_date <= today)),
     )
     .map((l) => ({ ...l, queue_order: order(l) }))
     .sort((a, b) => {

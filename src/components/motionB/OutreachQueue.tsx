@@ -24,11 +24,13 @@ interface Section {
 export default function OutreachQueue({ leads, loading, selectedId, doneIds, onSelect }: OutreachQueueProps) {
   const { scorecard } = useScorecard()
 
+  const replied = leads.filter((l) => l.status === 'reply-received')
   const t1s = leads.filter((l) => l.status === 'untouched')
   const t2s = leads.filter((l) => l.status === 't1-sent')
   const t3s = leads.filter((l) => l.status === 't2-sent')
 
   const sections: Section[] = [
+    { key: 'replied', title: 'Replied — confirm handover', dividerClass: 'bg-green/10 text-green', leads: replied },
     { key: 't1', title: 'T1s — first touch today', dividerClass: 'bg-chrome text-white', leads: t1s },
     { key: 't2', title: 'T2 follow-ups due today', dividerClass: 'bg-amber-light text-amber', leads: t2s },
     { key: 't3', title: 'T3 follow-ups due today', dividerClass: 'bg-soft text-muted', leads: t3s },
@@ -49,6 +51,7 @@ export default function OutreachQueue({ leads, loading, selectedId, doneIds, onS
         </div>
 
         <div className="mt-3 flex gap-3 font-mono text-[12px] text-muted">
+          {replied.length > 0 && <span className="text-green">Replied: {replied.length}</span>}
           <span>T1: {t1s.length}</span>
           <span>T2: {t2s.length}</span>
           <span>T3: {t3s.length}</span>
