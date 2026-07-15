@@ -61,7 +61,7 @@ export default function TouchHistory({ leadId }: { leadId: string }) {
               <span className="text-body-sm font-bold text-ink">
                 {touch.touch_number}
                 <span className="ml-2 font-normal text-muted">
-                  {touch.sent_by === 'rus' ? 'Rus' : 'Coordinator'} · {touch.channel}
+                  {touch.sent_by === 'rus' ? 'Owner' : 'Coordinator'} · {touch.channel}
                   {touch.replied && ' · replied'}
                 </span>
               </span>

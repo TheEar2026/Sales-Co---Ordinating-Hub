@@ -200,7 +200,7 @@ export default function DetailFooter({ lead, onUpdated }: DetailFooterProps) {
           />
           <span className="flex items-center gap-1.5 rounded bg-soft px-2 py-1 text-body-sm text-ink">
             <span className={`h-2 w-2 rounded-full ${lead.owner === 'rus' ? 'bg-gold-mid' : 'bg-green'}`} />
-            <span className="font-semibold">{lead.owner === 'rus' ? 'Rus' : 'Coordinator'}</span>
+            <span className="font-semibold">{lead.owner === 'rus' ? 'Owner' : 'Coordinator'}</span>
           </span>
         </div>
       </div>
