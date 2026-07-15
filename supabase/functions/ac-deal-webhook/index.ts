@@ -93,15 +93,22 @@ function extractDeal(payload: Record<string, any>): ParsedDeal {
 
   return {
     dealId: deal.id ?? null,
-    pipelineId: deal.group ?? deal.pipeline ?? null,
-    stageId: deal.stage ?? null,
-    valueCents: deal.value ?? null,
+    // Confirmed against a real "Deal Updated" webhook payload: AC sends
+    // `deal.pipelineid` / `deal.stageid`, not `deal.group` / `deal.stage`
+    // (those are the REST API's field names, not the webhook's — this
+    // account's webhooks arrive as JSON, not classic form-encoding).
+    // Fallbacks kept in case that ever differs.
+    pipelineId: deal.pipelineid ?? deal.group ?? deal.pipeline ?? null,
+    stageId: deal.stageid ?? deal.stage ?? null,
+    valueCents: deal.value ?? deal.value_raw ?? null,
     currency: deal.currency ?? null,
     title: deal.title ?? null,
-    contactEmail: contact.email ?? null,
-    contactFirstName: contact.first_name ?? null,
-    contactLastName: contact.last_name ?? null,
-    organizationName: organization.name ?? null,
+    contactEmail: contact.email ?? deal.contact_email ?? null,
+    contactFirstName: contact.first_name ?? deal.contact_firstname ?? null,
+    contactLastName: contact.last_name ?? deal.contact_lastname ?? null,
+    // Real payload has no nested `organization` object — it's a flat
+    // `orgname` on the deal (and duplicated at the top level).
+    organizationName: (deal.orgname || payload.orgname || organization.name || null) as string | null,
   };
 }
 
