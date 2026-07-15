@@ -52,6 +52,9 @@ function lead(partial: Partial<Lead> & Pick<Lead, 'contact_name' | 'school_name'
     ac_deal_id: null,
     ac_deal_value: null,
     ac_deal_stage: null,
+    ac_deal_currency: null,
+    needs_review: false,
+    review_reason: null,
     next_touch_date: null,
     demo_date: null,
     demo_booked_by: null,
@@ -266,6 +269,23 @@ export const mockLeads: Lead[] = [
     touch_count: 2,
     last_touch_date: daysAgo(3),
     next_touch_date: daysAgo(-3),
+  }),
+  // Auto-created by the AC deal-sync webhook — no matching ac_deal_id
+  // was found in Supabase, so it landed here flagged for review.
+  lead({
+    contact_name: 'Unknown contact (AC deal #1822)',
+    school_name: 'Greenway College',
+    motion: 'A',
+    owner: 'rus',
+    status: 'negotiation',
+    tier: 'ACTIVE',
+    ac_deal_id: 1822,
+    ac_deal_value: 47500,
+    ac_deal_currency: 'ZAR',
+    needs_review: true,
+    review_reason:
+      "Auto-created from AC deal #1822 — no matching ac_deal_id found in Supabase. Verify contact and school details.",
+    source: 'activecampaign',
   }),
 ]
 

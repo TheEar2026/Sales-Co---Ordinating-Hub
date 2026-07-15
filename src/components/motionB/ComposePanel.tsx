@@ -6,6 +6,7 @@ import { mergeTemplate } from '../../lib/mergeTemplate'
 import type { MotionBDailyLead, TouchNumber } from '../../types'
 import DatePicker from '../shared/DatePicker'
 import Icon from '../shared/Icon'
+import NeedsReviewBanner from '../shared/NeedsReviewBanner'
 import HandoverModal from './HandoverModal'
 
 function touchNumberForStatus(status: MotionBDailyLead['status']): TouchNumber {
@@ -115,6 +116,10 @@ export default function ComposePanel({ lead, onDone, onToast }: ComposePanelProp
         </section>
 
         <section className="space-y-6 px-8 py-6">
+          {lead.needs_review && (
+            <NeedsReviewBanner leadId={lead.id} reason={lead.review_reason} onDismissed={() => {}} />
+          )}
+
           {/* email draft */}
           <div className="overflow-hidden rounded-lg border border-email-line">
             <div className="flex items-center justify-between bg-email-bg px-4 py-2">

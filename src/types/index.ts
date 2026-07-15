@@ -58,6 +58,7 @@ export interface Lead {
   ac_deal_id: number | null
   ac_deal_value: number | null
   ac_deal_stage: string | null
+  ac_deal_currency: string | null
 
   next_touch_date: string | null
   demo_date: string | null
@@ -72,6 +73,9 @@ export interface Lead {
   next_action: string | null
   source: string | null
   source_motion: MotionType | null
+
+  needs_review: boolean
+  review_reason: string | null
 
   created_at: string
   updated_at: string
@@ -162,4 +166,5 @@ export interface Scorecard {
   sponsor_slots_total: number
   pending_handovers: number
   reply_rate_90d: number | null
+  needs_review_count: number
 }

@@ -24,7 +24,10 @@ export default function QueueCard({ lead, selected, done, onClick }: QueueCardPr
         {done && <Icon name="check" size={14} />}
       </span>
       <div className="min-w-0 flex-1">
-        <div className="truncate text-body-sm font-bold text-ink">{lead.contact_name}</div>
+        <div className="flex items-center gap-1">
+          {lead.needs_review && <Icon name="warning" size={12} filled className="shrink-0 text-amber" />}
+          <span className="truncate text-body-sm font-bold text-ink">{lead.contact_name}</span>
+        </div>
         <div className="truncate micro-label mt-0.5 text-muted">{lead.school_name}</div>
       </div>
       {lead.persona && (

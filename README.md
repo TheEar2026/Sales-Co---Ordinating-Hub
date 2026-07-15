@@ -11,6 +11,10 @@ motions, one pipeline:
 Replies from Motion B are handed off to Rus with one click; the handover
 fires a Supabase→Resend email automatically.
 
+ActiveCampaign is the source of truth for deal stage — when a deal moves
+in AC Pipeline 5 ("Sales Conversion"), a webhook updates the matching
+lead in Supabase automatically (see AC deal sync below).
+
 ## Stack
 
 React 18 + TypeScript + Vite, Tailwind CSS, Supabase (Postgres + Auth +
@@ -36,6 +40,10 @@ Remaining before day-to-day use:
    `supabase secrets set RESEND_API_KEY=<key>` is run and the-ear.com is
    confirmed verified in Resend. Everything else about the handover
    works without it (lead reassignment, real-time sync).
+3. **AC deal sync** — schema patch 2 + the `ac-deal-webhook` function
+   are written and ready; deploying the function, setting
+   `AC_WEBHOOK_SECRET`, and adding the webhook in ActiveCampaign itself
+   are still outstanding (see ActiveCampaign deal sync below).
 
 ## Demo mode (try it without Supabase)
 
@@ -60,6 +68,9 @@ editor. Data resets on page refresh. Demo mode is off unless
      templates and sponsorship slots.
    - `supabase_schema_patch.sql` — adds `leads.next_action`, used by the
      Motion A "Next action" box (a manual note, distinct from `notes`).
+   - `supabase_schema_patch_2.sql` — adds the `webhook_log` audit table,
+     `leads.needs_review` / `review_reason` / `ac_deal_currency`, and
+     extends the `scorecard` view. Required for the AC deal sync below.
 2. **Create the two users** in Supabase Auth → Users (Rus and the
    coordinator), then insert their rows into `public.users` with the
    matching `id`, `email`, `full_name`, and `role`.
@@ -80,6 +91,42 @@ editor. Data resets on page refresh. Demo mode is off unless
    `handover_events` INSERT → Edge Function `notify-handover`.
 5. **Deploy to Vercel** and add the same two `VITE_*` env vars there.
 
+## ActiveCampaign deal sync
+
+Keeps Supabase in sync with deal stage changes in AC Pipeline 5 ("Sales
+Conversion") — no manual dashboard update required. Confirmed against
+the live AC account: pipeline (`group`) ID **5**, stages 43 (Demo/Pilot),
+46 (Negotiation), 47 (Agreed), 48 (Won), 49 (Lost) — Won/Lost are stages
+within this pipeline, not a separate status field.
+
+1. **Deploy the function:**
+   ```bash
+   supabase functions deploy ac-deal-webhook
+   supabase secrets set AC_WEBHOOK_SECRET=<a random string you generate>
+   ```
+2. **In ActiveCampaign:** Settings → Developer → Webhooks → Add webhook
+   - Event: **Deal Updated**
+   - URL: `https://<project-ref>.functions.supabase.co/ac-deal-webhook?secret=<same AC_WEBHOOK_SECRET value>`
+   - AC's webhook UI has no custom-header option, so the secret travels
+     as a query parameter — the function checks it before doing anything
+     else and returns 401 if it doesn't match.
+3. **How it decides what to update:** the function reads `deal.group`
+   (pipeline) and `deal.stage`, ignores anything outside pipeline 5, and
+   maps the stage to a lead `status`/`motion`/`owner`. It looks the lead
+   up by `ac_deal_id`; if none matches, it **creates** a new lead from
+   whatever contact/organization fields the webhook included and sets
+   `needs_review = true` so it surfaces as an amber flag on the card, in
+   the detail panel, and as a count on the Scorecard until someone
+   confirms it.
+4. **Currency:** the Sales Conversion pipeline holds deals in more than
+   one currency (ZAR, GBP, USD observed) — `ac_deal_value` is converted
+   from AC's cents to whole units, and `ac_deal_currency` records which
+   currency it actually is rather than assuming ZAR.
+5. **Audit trail:** every webhook call — matched, ignored, or errored —
+   is logged to `webhook_log` (deal id, pipeline, stage, resulting
+   status, and the raw payload) so the sync can be debugged from the
+   data alone.
+
 ## Project layout
 
 ```
@@ -89,9 +136,11 @@ src/
   lib/          supabase client, handover RPC call, template merge
   pages/        Login, Dashboard
   types/        TypeScript types matching the Supabase schema
-supabase/functions/notify-handover/   Resend email edge function
-supabase_schema.sql                   full DB schema
-supabase_schema_patch.sql             additive patch (leads.next_action)
+supabase/functions/notify-handover/    Resend email edge function
+supabase/functions/ac-deal-webhook/    AC → Supabase deal-stage sync
+supabase_schema.sql                    full DB schema
+supabase_schema_patch.sql              additive patch (leads.next_action, realtime)
+supabase_schema_patch_2.sql            additive patch (webhook_log, needs_review, AC deal sync)
 ```
 
 ## End-to-end test (once live)

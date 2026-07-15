@@ -120,6 +120,7 @@ function scorecard(): Row[] {
       sponsor_slots_total: store.sponsorship_slots.length,
       pending_handovers: leads.filter((l) => l.status === 'reply-received' && l.owner === 'rus').length,
       reply_rate_90d: recent.length ? Math.round((replied / recent.length) * 1000) / 10 : null,
+      needs_review_count: leads.filter((l) => l.needs_review).length,
     },
   ]
 }

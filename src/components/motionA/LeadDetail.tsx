@@ -4,6 +4,7 @@ import type { MotionADailyLead } from '../../types'
 import StatusChip from '../shared/StatusChip'
 import TierBadge from '../shared/TierBadge'
 import Icon from '../shared/Icon'
+import NeedsReviewBanner from '../shared/NeedsReviewBanner'
 import TouchHistory from './TouchHistory'
 import DetailFooter from './DetailFooter'
 
@@ -63,6 +64,10 @@ export default function LeadDetail({ lead, onUpdated }: LeadDetailProps) {
         </section>
 
         <section className="space-y-8 px-8 py-6">
+          {lead.needs_review && (
+            <NeedsReviewBanner leadId={lead.id} reason={lead.review_reason} onDismissed={onUpdated} />
+          )}
+
           {/* Next action */}
           <div className="rounded-lg border border-brand-gold/20 bg-gold-light p-5">
             <div className="mb-2 flex items-center gap-2">

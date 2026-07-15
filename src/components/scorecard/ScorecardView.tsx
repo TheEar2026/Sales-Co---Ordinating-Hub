@@ -94,6 +94,12 @@ export default function ScorecardView() {
           icon="reply_all"
         />
         <MetricCard label="Pending handovers" value={scorecard.pending_handovers} icon="assignment_turned_in" />
+        <MetricCard
+          label="Needs review"
+          value={scorecard.needs_review_count}
+          icon="warning"
+          valueClass={scorecard.needs_review_count > 0 ? 'text-amber' : 'text-ink'}
+        />
       </div>
 
       <div className="mb-8">

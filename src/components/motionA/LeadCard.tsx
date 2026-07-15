@@ -1,5 +1,6 @@
 import type { MotionADailyLead } from '../../types'
 import TierBadge from '../shared/TierBadge'
+import Icon from '../shared/Icon'
 
 function formatZAR(value: number | null): string {
   if (!value) return ''
@@ -43,7 +44,12 @@ export default function LeadCard({ lead, selected, onClick }: LeadCardProps) {
       <div className="min-w-0 flex-1">
         <div className="mb-1 flex items-start justify-between gap-2">
           <span className="truncate text-[14px] font-bold text-ink">{lead.contact_name}</span>
-          <TierBadge tier={lead.tier} />
+          <div className="flex shrink-0 items-center gap-1">
+            {lead.needs_review && (
+              <Icon name="warning" size={13} filled className="text-amber" />
+            )}
+            <TierBadge tier={lead.tier} />
+          </div>
         </div>
         <p className="micro-label mb-2 truncate text-muted">{lead.school_name}</p>
         <div className="flex items-center justify-between">
