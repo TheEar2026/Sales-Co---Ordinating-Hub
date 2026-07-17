@@ -1,4 +1,4 @@
-export type TabKey = 'motionA' | 'motionB' | 'scorecard'
+export type TabKey = 'motionA' | 'motionB' | 'allLeads' | 'scorecard'
 
 interface TabBarProps {
   active: TabKey
@@ -17,6 +17,7 @@ export default function TabBar({ active, onChange, motionACount, motionBCount }:
   const tabs: TabDef[] = [
     { key: 'motionA', label: 'Motion A', count: motionACount },
     { key: 'motionB', label: 'Motion B', count: motionBCount },
+    { key: 'allLeads', label: 'All Leads', count: 0 },
     { key: 'scorecard', label: 'Scorecard', count: 0 },
   ]
 

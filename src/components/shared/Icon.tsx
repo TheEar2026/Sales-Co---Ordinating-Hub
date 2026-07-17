@@ -25,6 +25,8 @@ import {
   Hourglass,
   Sun,
   Moon,
+  Search,
+  X,
   type LucideIcon,
 } from 'lucide-react'
 
@@ -57,6 +59,8 @@ const ICONS: Record<string, LucideIcon> = {
   hourglass_empty: Hourglass,
   light_mode: Sun,
   dark_mode: Moon,
+  search: Search,
+  close: X,
 }
 
 interface IconProps {

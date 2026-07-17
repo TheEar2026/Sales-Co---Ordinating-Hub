@@ -10,6 +10,7 @@ import LeadList from '../components/motionA/LeadList'
 import LeadDetail from '../components/motionA/LeadDetail'
 import OutreachQueue from '../components/motionB/OutreachQueue'
 import ComposePanel from '../components/motionB/ComposePanel'
+import AllLeadsView from '../components/allLeads/AllLeadsView'
 import ScorecardView from '../components/scorecard/ScorecardView'
 import TemplateEditor from '../components/templates/TemplateEditor'
 
@@ -145,6 +146,8 @@ export default function Dashboard() {
           )}
         </div>
       )}
+
+      {tab === 'allLeads' && <AllLeadsView />}
 
       {tab === 'scorecard' && <ScorecardView />}
 
