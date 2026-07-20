@@ -113,7 +113,13 @@ async function fetchMessagesSince(
 async function getLastScanTime(): Promise<string> {
   const { data } = await supabase.from("app_config").select("value").eq("key", CONFIG_KEY).maybeSingle();
   // First-ever run: default to 24h ago rather than scanning full mailbox history.
-  return data?.value ?? new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+  const raw = data?.value ?? new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+  // Defensive: Graph's $filter rejects anything but strict ISO 8601 (a "T"
+  // separator, no bare space). Whatever's stored — including a value set by
+  // hand via SQL, which yields Postgres's space-separated text form — gets
+  // normalized here so a malformed watermark can never wedge every future
+  // scan into a permanent 400 loop, which is exactly what happened once.
+  return new Date(raw).toISOString();
 }
 
 async function setLastScanTime(iso: string) {
