@@ -1,5 +1,6 @@
 import { useScorecard } from '../../hooks/useScorecard'
 import Icon from '../shared/Icon'
+import type { MotionADailyLead, MotionBDailyLead } from '../../types'
 
 const YEAR_TARGET = 126
 
@@ -28,7 +29,12 @@ function Metric({ label, value, valueClass = 'text-ink', sub }: MetricProps) {
   )
 }
 
-export default function ScoreStrip() {
+interface ScoreStripProps {
+  motionALeads: MotionADailyLead[]
+  motionBLeads: MotionBDailyLead[]
+}
+
+export default function ScoreStrip({ motionALeads, motionBLeads }: ScoreStripProps) {
   const { scorecard, loading } = useScorecard()
 
   if (loading && !scorecard) {
@@ -37,6 +43,7 @@ export default function ScoreStrip() {
   if (!scorecard) return null
 
   const progressPct = Math.min(100, (scorecard.paying_schools / YEAR_TARGET) * 100)
+  const motionBUntouched = motionBLeads.filter((l) => l.status === 'untouched').length
 
   return (
     <section className="flex items-center justify-between border-b border-line bg-card px-4 py-2">
@@ -49,11 +56,11 @@ export default function ScoreStrip() {
         />
         <Metric
           label="Motion A"
-          value={scorecard.motion_a_pipeline}
+          value={motionALeads.length}
           valueClass="text-gold-mid"
           sub={`${formatZAR(scorecard.motion_a_open_value)} open`}
         />
-        <Metric label="Motion B" value={scorecard.motion_b_untouched} sub="untouched" />
+        <Metric label="Motion B" value={motionBLeads.length} sub={`${motionBUntouched} untouched`} />
         <Metric
           label="Sponsor slots"
           value={`${scorecard.sponsor_slots_placed}/${scorecard.sponsor_slots_total}`}

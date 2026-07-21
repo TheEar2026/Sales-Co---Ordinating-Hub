@@ -88,7 +88,7 @@ export default function Dashboard() {
   return (
     <div className="flex h-screen flex-col bg-app">
       <TopBar onOpenTemplates={() => setTemplatesOpen(true)} />
-      <ScoreStrip />
+      <ScoreStrip motionALeads={motionALeads} motionBLeads={motionBLeads} />
       <TabBar
         active={tab}
         onChange={setTab}

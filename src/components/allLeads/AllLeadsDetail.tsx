@@ -41,6 +41,21 @@ export default function AllLeadsDetail({ lead, onUpdated }: AllLeadsDetailProps)
     onUpdated()
   }
 
+  async function moveToMotionB() {
+    if (!canEdit) return
+    await supabase
+      .from('leads')
+      .update({
+        motion: 'B',
+        owner: 'coordinator',
+        status: 'untouched',
+        needs_review: true,
+        review_reason: 'Revived from Parked — see notes for approach.',
+      })
+      .eq('id', lead.id)
+    onUpdated()
+  }
+
   return (
     <article className="flex flex-1 flex-col overflow-hidden bg-card">
       <div className="flex-1 overflow-y-auto">
@@ -61,6 +76,14 @@ export default function AllLeadsDetail({ lead, onUpdated }: AllLeadsDetailProps)
               <span className={`h-1.5 w-1.5 rounded-full ${lead.owner === 'rus' ? 'bg-gold-mid' : 'bg-green'}`} />
               {lead.owner === 'rus' ? 'Owner' : 'Coordinator'}
             </span>
+            {lead.status === 'parked' && canEdit && (
+              <button
+                onClick={moveToMotionB}
+                className="rounded border border-gold px-2 py-0.5 text-[11px] font-bold uppercase tracking-wide text-gold-mid hover:bg-gold-light"
+              >
+                Move to Motion B
+              </button>
+            )}
           </div>
         </section>
 
