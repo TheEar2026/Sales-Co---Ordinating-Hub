@@ -6,7 +6,7 @@ import MetricCard from './MetricCard'
 import CloseList from './CloseList'
 import LoadingSpinner from '../shared/LoadingSpinner'
 
-const YEAR_TARGET = 126
+const YEAR_TARGET = 60
 
 const POOL_STATUSES: { status: LeadStatus; label: string }[] = [
   { status: 'untouched', label: 'Untouched' },

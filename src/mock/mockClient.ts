@@ -114,7 +114,7 @@ function scorecard(): Row[] {
   const replied = recent.filter((t) => t.replied).length
   return [
     {
-      paying_schools: leads.filter((l) => l.status === 'won').length,
+      paying_schools: new Set(leads.filter((l) => l.status === 'won').map((l) => l.school_name)).size,
       motion_a_pipeline: leads.filter((l) => l.motion === 'A' && !OPEN_EXCLUDED.includes(l.status)).length,
       motion_b_untouched: leads.filter((l) => l.motion === 'B' && l.status === 'untouched').length,
       motion_b_touched: leads.filter((l) => l.motion === 'B' && l.status !== 'untouched').length,

@@ -2,7 +2,7 @@ import { useScorecard } from '../../hooks/useScorecard'
 import Icon from '../shared/Icon'
 import type { MotionADailyLead, MotionBDailyLead } from '../../types'
 
-const YEAR_TARGET = 126
+const YEAR_TARGET = 60
 
 function formatZAR(value: number): string {
   return new Intl.NumberFormat('en-ZA', {
