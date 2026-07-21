@@ -78,6 +78,16 @@ editor. Data resets on page refresh. Demo mode is off unless
    - `supabase_schema_patch_3.sql` — adds `app_config`, `outlook_reply_log`,
      the `find_lead_by_email` lookup function, and enables `pg_cron` /
      `pg_net`. Required for Outlook reply detection below.
+   - `supabase_schema_patch_4.sql` — fixes `motion_b_daily` to include
+     `reply-received` leads awaiting handover (they used to be invisible
+     everywhere once Outlook auto-detected a reply).
+   - `supabase_schema_patch_5.sql` — fixes `motion_a_daily` to filter on
+     `motion = 'A'` as well as `owner = 'rus'`, so a lead with a
+     mismatched motion/owner pair can't land in the wrong queue.
+   - `supabase_schema_patch_6.sql` and `supabase_schema_patch_7.sql` — fix
+     `paying_schools` on the `scorecard` view to count distinct schools
+     (case/whitespace-insensitive), not raw won-lead rows — one school
+     with multiple won contacts was being counted multiple times.
 2. **Create the two users** in Supabase Auth → Users (Rus and the
    coordinator), then insert their rows into `public.users` with the
    matching `id`, `email`, `full_name`, and `role`.
@@ -217,6 +227,10 @@ supabase_schema.sql                    full DB schema
 supabase_schema_patch.sql               additive patch (leads.next_action, realtime)
 supabase_schema_patch_2.sql             additive patch (webhook_log, needs_review, AC deal sync)
 supabase_schema_patch_3.sql             additive patch (app_config, outlook_reply_log, pg_cron)
+supabase_schema_patch_4.sql             corrective patch (motion_b_daily shows reply-received)
+supabase_schema_patch_5.sql             corrective patch (motion_a_daily filters on motion + owner)
+supabase_schema_patch_6.sql             corrective patch (paying_schools counts distinct schools)
+supabase_schema_patch_7.sql             corrective patch (paying_schools case/whitespace-insensitive)
 ```
 
 ## End-to-end test (once live)

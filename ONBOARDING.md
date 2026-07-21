@@ -20,7 +20,7 @@ with you separately, or `README.md`'s intro section.
 - **Database:** Supabase project `oowfsxjngaxzxdsdnpxr`
 - **Edge functions:** `supabase/functions/` — `notify-handover`, `ac-deal-webhook`,
   `outlook-reply-scan`
-- **Schema:** `supabase_schema.sql` plus `supabase_schema_patch.sql` through `_4.sql`, applied
+- **Schema:** `supabase_schema.sql` plus `supabase_schema_patch.sql` through `_7.sql`, applied
   in that order — each patch file explains what it adds and why
 
 ## Getting set up
