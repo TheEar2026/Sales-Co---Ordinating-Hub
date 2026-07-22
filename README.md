@@ -148,7 +148,7 @@ within this pipeline, not a separate status field.
 
 ## Outlook reply detection
 
-Twice daily (08:00 and 18:00 SAST, via `pg_cron`), a scan checks Rus's
+Twice daily (06:00 and 18:00 SAST, via `pg_cron`), a scan checks Rus's
 and the coordinator's Outlook inboxes for new mail and moves any lead
 that replies from `t1-sent` / `t2-sent` / `t3-sent` to `reply-received`
 — Badi never has to log a reply by hand. **Live and scheduled.**
@@ -183,9 +183,9 @@ mailbox instead.
    Check the `outlook_reply_log` table for what it found (or
    `app_config` for the `outlook_last_scan_at` watermark it set).
 4. **The twice-daily schedule** is registered via `pg_cron`
-   (`outlook-reply-scan-morning` at `0 6 * * *`,
-   `outlook-reply-scan-evening` at `0 16 * * *` — 06:00/16:00 UTC =
-   08:00/18:00 SAST), each firing `net.http_post` at the function with
+   (`outlook-reply-scan-morning` at `0 4 * * *`,
+   `outlook-reply-scan-evening` at `0 16 * * *` — 04:00/16:00 UTC =
+   06:00/18:00 SAST), each firing `net.http_post` at the function with
    the `CRON_SECRET` bearer token. Check `select * from cron.job;` and
    `select * from cron.job_run_details order by start_time desc;` to
    confirm runs are firing and succeeding.
