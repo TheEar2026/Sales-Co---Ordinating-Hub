@@ -151,6 +151,7 @@ class MockQueryBuilder implements PromiseLike<QueryResult> {
   private orders: { column: string; ascending: boolean }[] = []
   private payload: Row | Row[] | null = null
   private singleRow = false
+  private rangeBounds: [number, number] | null = null
 
   constructor(table: string) {
     this.table = table
@@ -193,6 +194,11 @@ class MockQueryBuilder implements PromiseLike<QueryResult> {
 
   single() {
     this.singleRow = true
+    return this
+  }
+
+  range(from: number, to: number) {
+    this.rangeBounds = [from, to]
     return this
   }
 
@@ -247,6 +253,11 @@ class MockQueryBuilder implements PromiseLike<QueryResult> {
         const cmp = String(av ?? '') < String(bv ?? '') ? -1 : 1
         return order.ascending ? cmp : -cmp
       })
+    }
+
+    if (this.rangeBounds) {
+      const [from, to] = this.rangeBounds
+      rows = rows.slice(from, to + 1)
     }
 
     // Return copies so callers never mutate the store directly.

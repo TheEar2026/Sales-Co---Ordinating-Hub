@@ -1,10 +1,14 @@
+import { useEffect, useRef } from 'react'
+import { VariableSizeList, type ListChildComponentProps } from 'react-window'
+import { AutoSizer } from 'react-virtualized-auto-sizer'
 import type { MotionBDailyLead } from '../../types'
 import { useScorecard } from '../../hooks/useScorecard'
 import QueueCard from './QueueCard'
 import LoadingSpinner from '../shared/LoadingSpinner'
 import Icon from '../shared/Icon'
 
-const MOTION_B_POOL = 204
+const HEADER_HEIGHT = 32
+const CARD_HEIGHT = 62
 
 interface OutreachQueueProps {
   leads: MotionBDailyLead[]
@@ -20,6 +24,8 @@ interface Section {
   dividerClass: string
   leads: MotionBDailyLead[]
 }
+
+type FlatRow = { type: 'header'; section: Section } | { type: 'lead'; lead: MotionBDailyLead }
 
 export default function OutreachQueue({ leads, loading, selectedId, doneIds, onSelect }: OutreachQueueProps) {
   const { scorecard } = useScorecard()
@@ -37,14 +43,51 @@ export default function OutreachQueue({ leads, loading, selectedId, doneIds, onS
   ]
 
   const touched = scorecard?.motion_b_touched ?? 0
-  const poolPct = Math.min(100, (touched / MOTION_B_POOL) * 100)
+  const totalPool = touched + (scorecard?.motion_b_untouched ?? 0)
+  const poolPct = totalPool > 0 ? Math.min(100, (touched / totalPool) * 100) : 0
+
+  const rows: FlatRow[] = sections.flatMap((section) =>
+    section.leads.length > 0
+      ? [{ type: 'header' as const, section }, ...section.leads.map((lead) => ({ type: 'lead' as const, lead }))]
+      : [],
+  )
+
+  // VariableSizeList caches computed row offsets by index — when the
+  // underlying leads change (a lead moves between sections, one gets
+  // added/removed), the header/lead layout at a given index can shift, so
+  // the cache must be explicitly invalidated rather than left stale.
+  const listRef = useRef<VariableSizeList>(null)
+  useEffect(() => {
+    listRef.current?.resetAfterIndex(0)
+  }, [leads])
+
+  function Row({ index, style }: ListChildComponentProps) {
+    const row = rows[index]
+    if (row.type === 'header') {
+      return (
+        <div style={style} className={`micro-label px-3 py-2 ${row.section.dividerClass}`}>
+          {row.section.title}
+        </div>
+      )
+    }
+    return (
+      <div style={style}>
+        <QueueCard
+          lead={row.lead}
+          selected={row.lead.id === selectedId}
+          done={doneIds.has(row.lead.id)}
+          onClick={() => onSelect(row.lead)}
+        />
+      </div>
+    )
+  }
 
   return (
-    <aside className="flex w-[370px] shrink-0 flex-col overflow-y-auto border-r border-line bg-card">
+    <aside className="flex w-[370px] shrink-0 flex-col overflow-hidden border-r border-line bg-card">
       <header className="border-b border-line px-3 py-3">
         <h2 className="text-body-md font-bold text-ink">Coordinator outreach queue</h2>
         <div className="micro-label mt-2 text-muted">
-          Pool progress · {touched}/{MOTION_B_POOL}
+          Pool progress · {touched}/{totalPool}
         </div>
         <div className="mt-1 h-1.5 w-full rounded-full bg-soft">
           <div className="h-1.5 rounded-full bg-green" style={{ width: `${poolPct}%` }} />
@@ -67,23 +110,23 @@ export default function OutreachQueue({ leads, loading, selectedId, doneIds, onS
       ) : leads.length === 0 ? (
         <div className="px-3 py-8 text-center text-body-sm text-muted">Queue is clear for today.</div>
       ) : (
-        sections.map(
-          (section) =>
-            section.leads.length > 0 && (
-              <div key={section.key}>
-                <div className={`micro-label px-3 py-2 ${section.dividerClass}`}>{section.title}</div>
-                {section.leads.map((lead) => (
-                  <QueueCard
-                    key={lead.id}
-                    lead={lead}
-                    selected={lead.id === selectedId}
-                    done={doneIds.has(lead.id)}
-                    onClick={() => onSelect(lead)}
-                  />
-                ))}
-              </div>
-            ),
-        )
+        <div className="min-h-0 flex-1">
+          <AutoSizer
+            renderProp={({ height, width }) =>
+              height && width ? (
+                <VariableSizeList
+                  ref={listRef}
+                  height={height}
+                  width={width}
+                  itemCount={rows.length}
+                  itemSize={(index) => (rows[index].type === 'header' ? HEADER_HEIGHT : CARD_HEIGHT)}
+                >
+                  {Row}
+                </VariableSizeList>
+              ) : null
+            }
+          />
+        </div>
       )}
     </aside>
   )

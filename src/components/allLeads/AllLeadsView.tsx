@@ -1,10 +1,14 @@
 import { useMemo, useState } from 'react'
+import { FixedSizeList, type ListChildComponentProps } from 'react-window'
+import { AutoSizer } from 'react-virtualized-auto-sizer'
 import { useAllLeads } from '../../hooks/useLeads'
 import type { Lead, LeadStatus, OwnerType } from '../../types'
 import AllLeadsRow from './AllLeadsRow'
 import AllLeadsDetail from './AllLeadsDetail'
 import LoadingSpinner from '../shared/LoadingSpinner'
 import Icon from '../shared/Icon'
+
+const ROW_HEIGHT = 76
 
 const STATUS_LABELS: Record<LeadStatus, string> = {
   untouched: 'Untouched',
@@ -58,6 +62,15 @@ export default function AllLeadsView() {
   // copy, so edits and realtime updates show immediately.
   const selected = selectedId ? (leads.find((l) => l.id === selectedId) ?? null) : null
 
+  function Row({ index, style }: ListChildComponentProps) {
+    const lead = filtered[index]
+    return (
+      <div style={style}>
+        <AllLeadsRow lead={lead} selected={lead.id === selectedId} onClick={() => setSelectedId(lead.id)} />
+      </div>
+    )
+  }
+
   return (
     <div className="flex flex-1 overflow-hidden">
       <aside className="flex w-[340px] shrink-0 flex-col overflow-hidden border-r border-line bg-card">
@@ -103,20 +116,21 @@ export default function AllLeadsView() {
           </div>
         </header>
 
-        <div className="flex-1 overflow-y-auto">
+        <div className="min-h-0 flex-1">
           {loading ? (
             <LoadingSpinner label="Loading leads…" />
           ) : filtered.length === 0 ? (
             <div className="px-3 py-8 text-center text-body-sm text-muted">No leads match.</div>
           ) : (
-            filtered.map((lead) => (
-              <AllLeadsRow
-                key={lead.id}
-                lead={lead}
-                selected={lead.id === selectedId}
-                onClick={() => setSelectedId(lead.id)}
-              />
-            ))
+            <AutoSizer
+              renderProp={({ height, width }) =>
+                height && width ? (
+                  <FixedSizeList height={height} width={width} itemCount={filtered.length} itemSize={ROW_HEIGHT}>
+                    {Row}
+                  </FixedSizeList>
+                ) : null
+              }
+            />
           )}
         </div>
       </aside>
