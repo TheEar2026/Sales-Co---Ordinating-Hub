@@ -103,6 +103,7 @@ export default function ComposePanel({ lead, onDone, onUpdated, onToast }: Compo
 
   async function updateT2Date(value: string) {
     await supabase.from('leads').update({ next_touch_date: value || null }).eq('id', lead.id)
+    onUpdated()
   }
 
   async function saveNotes() {
