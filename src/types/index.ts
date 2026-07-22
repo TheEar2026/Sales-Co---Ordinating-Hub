@@ -44,6 +44,7 @@ export interface Lead {
   contact_name: string
   contact_email: string | null
   contact_role: string | null
+  contact_phone: string | null
   school_name: string
   school_province: string | null
   school_type: string | null

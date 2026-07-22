@@ -42,6 +42,7 @@ function lead(partial: Partial<Lead> & Pick<Lead, 'contact_name' | 'school_name'
     id: `lead-${String(leadSeq).padStart(3, '0')}`,
     contact_email: null,
     contact_role: null,
+    contact_phone: null,
     school_province: 'Western Cape',
     school_type: 'Independent prep',
     persona: null,

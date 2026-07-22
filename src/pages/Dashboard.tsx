@@ -137,6 +137,7 @@ export default function Dashboard() {
             <ComposePanel
               lead={selectedBLead}
               onDone={() => markBLeadDone(selectedBLead.id)}
+              onUpdated={refetchB}
               onToast={(type, message) => setToast({ type, message })}
             />
           ) : (

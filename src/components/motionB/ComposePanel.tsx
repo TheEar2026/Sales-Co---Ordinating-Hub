@@ -7,6 +7,7 @@ import type { MotionBDailyLead, TouchNumber } from '../../types'
 import DatePicker from '../shared/DatePicker'
 import Icon from '../shared/Icon'
 import NeedsReviewBanner from '../shared/NeedsReviewBanner'
+import ContactFieldsEditor from '../shared/ContactFieldsEditor'
 import HandoverModal from './HandoverModal'
 
 function touchNumberForStatus(status: MotionBDailyLead['status']): TouchNumber {
@@ -24,15 +25,21 @@ function nextStatusForTouch(touchNumber: TouchNumber): MotionBDailyLead['status'
 interface ComposePanelProps {
   lead: MotionBDailyLead
   onDone: () => void
+  onUpdated: () => void
   onToast: (type: 'success' | 'error', message: string) => void
 }
 
-export default function ComposePanel({ lead, onDone, onToast }: ComposePanelProps) {
+export default function ComposePanel({ lead, onDone, onUpdated, onToast }: ComposePanelProps) {
   const { profile } = useAuth()
   const { templates } = useTemplates()
   const [selectedTemplateId, setSelectedTemplateId] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
   const [handoverOpen, setHandoverOpen] = useState(false)
+  const [notes, setNotes] = useState(lead.notes ?? '')
+
+  useEffect(() => {
+    setNotes(lead.notes ?? '')
+  }, [lead.id, lead.notes])
 
   const hasReplied = lead.status === 'reply-received'
   const touchNumber = touchNumberForStatus(lead.status)
@@ -98,6 +105,12 @@ export default function ComposePanel({ lead, onDone, onToast }: ComposePanelProp
     await supabase.from('leads').update({ next_touch_date: value || null }).eq('id', lead.id)
   }
 
+  async function saveNotes() {
+    if (notes === (lead.notes ?? '')) return
+    await supabase.from('leads').update({ notes: notes || null }).eq('id', lead.id)
+    onUpdated()
+  }
+
   return (
     <article className="flex flex-1 flex-col overflow-hidden bg-card">
       <div className="flex-1 overflow-y-auto">
@@ -122,8 +135,13 @@ export default function ComposePanel({ lead, onDone, onToast }: ComposePanelProp
 
         <section className="space-y-6 px-8 py-6">
           {lead.needs_review && (
-            <NeedsReviewBanner leadId={lead.id} reason={lead.review_reason} onDismissed={() => {}} />
+            <NeedsReviewBanner leadId={lead.id} reason={lead.review_reason} onDismissed={onUpdated} />
           )}
+
+          <div>
+            <h3 className="micro-label mb-3 text-muted">Contact details</h3>
+            <ContactFieldsEditor lead={lead} canEdit={true} onUpdated={onUpdated} />
+          </div>
 
           {hasReplied ? (
             /* reply already detected (Outlook auto-detection, or noticed manually) — nothing left
@@ -188,9 +206,14 @@ export default function ComposePanel({ lead, onDone, onToast }: ComposePanelProp
           {/* school context */}
           <div>
             <h3 className="micro-label mb-2 text-muted">School context</h3>
-            <p className="whitespace-pre-wrap text-body-md text-muted">
-              {lead.notes || 'No notes yet.'}
-            </p>
+            <textarea
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              onBlur={saveNotes}
+              rows={5}
+              placeholder="Full running notes for this contact…"
+              className="w-full rounded-lg border border-line bg-soft p-4 text-body-md leading-relaxed text-ink focus:outline-none focus:ring-2 focus:ring-gold"
+            />
           </div>
         </section>
       </div>

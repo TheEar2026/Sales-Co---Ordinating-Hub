@@ -6,6 +6,7 @@ import StatusChip from '../shared/StatusChip'
 import TierBadge from '../shared/TierBadge'
 import TouchHistory from '../motionA/TouchHistory'
 import NeedsReviewBanner from '../shared/NeedsReviewBanner'
+import ContactFieldsEditor from '../shared/ContactFieldsEditor'
 
 function formatZAR(value: number | null): string {
   if (!value) return '—'
@@ -92,11 +93,12 @@ export default function AllLeadsDetail({ lead, onUpdated }: AllLeadsDetailProps)
             <NeedsReviewBanner leadId={lead.id} reason={lead.review_reason} onDismissed={onUpdated} />
           )}
 
+          <div>
+            <h3 className="micro-label mb-3 text-muted">Contact details</h3>
+            <ContactFieldsEditor lead={lead} canEdit={canEdit} onUpdated={onUpdated} />
+          </div>
+
           <div className="grid grid-cols-2 gap-x-4 gap-y-5 sm:grid-cols-3">
-            <div>
-              <h3 className="micro-label mb-1 text-muted">Contact email</h3>
-              <p className="text-body-sm text-ink">{lead.contact_email ?? '—'}</p>
-            </div>
             <div>
               <h3 className="micro-label mb-1 text-muted">Persona</h3>
               <p className="text-body-sm text-ink">{lead.persona ?? '—'}</p>
