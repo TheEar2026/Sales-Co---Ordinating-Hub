@@ -106,55 +106,59 @@ export default function Dashboard() {
         </div>
       )}
 
-      {tab === 'motionA' && (
-        <div className="flex flex-1 overflow-hidden">
-          <LeadList
-            leads={motionALeads}
-            loading={motionALoading}
-            selectedId={selectedALead?.id ?? null}
-            onSelect={setSelectedALead}
-          />
-          {selectedALead ? (
-            <LeadDetail lead={selectedALead} onUpdated={refetchA} />
-          ) : (
-            <div className="flex flex-1 items-center justify-center bg-soft text-body-md text-muted">
-              Select a lead to see details.
-            </div>
-          )}
-        </div>
-      )}
-
-      {tab === 'motionB' && (
-        <div className="flex flex-1 overflow-hidden">
-          <OutreachQueue
-            leads={motionBLeads}
-            loading={motionBLoading}
-            selectedId={selectedBLead?.id ?? null}
-            doneIds={doneIds}
-            onSelect={setSelectedBLead}
-          />
-          {selectedBLead ? (
-            <ComposePanel
-              lead={selectedBLead}
-              onDone={() => markBLeadDone(selectedBLead.id)}
-              onUpdated={refetchB}
-              onToast={(type, message) => setToast({ type, message })}
+      <div
+        className={`flex flex-1 overflow-hidden transition-[margin-right] duration-200 ${
+          templatesOpen ? 'mr-[420px]' : ''
+        }`}
+      >
+        {tab === 'motionA' && (
+          <div className="flex flex-1 overflow-hidden">
+            <LeadList
+              leads={motionALeads}
+              loading={motionALoading}
+              selectedId={selectedALead?.id ?? null}
+              onSelect={setSelectedALead}
             />
-          ) : (
-            <div className="flex flex-1 items-center justify-center bg-soft text-body-md text-muted">
-              Select a lead from the queue.
-            </div>
-          )}
-        </div>
-      )}
+            {selectedALead ? (
+              <LeadDetail lead={selectedALead} onUpdated={refetchA} />
+            ) : (
+              <div className="flex flex-1 items-center justify-center bg-soft text-body-md text-muted">
+                Select a lead to see details.
+              </div>
+            )}
+          </div>
+        )}
 
-      {tab === 'allLeads' && <AllLeadsView />}
+        {tab === 'motionB' && (
+          <div className="flex flex-1 overflow-hidden">
+            <OutreachQueue
+              leads={motionBLeads}
+              loading={motionBLoading}
+              selectedId={selectedBLead?.id ?? null}
+              doneIds={doneIds}
+              onSelect={setSelectedBLead}
+            />
+            {selectedBLead ? (
+              <ComposePanel
+                lead={selectedBLead}
+                onDone={() => markBLeadDone(selectedBLead.id)}
+                onUpdated={refetchB}
+                onToast={(type, message) => setToast({ type, message })}
+              />
+            ) : (
+              <div className="flex flex-1 items-center justify-center bg-soft text-body-md text-muted">
+                Select a lead from the queue.
+              </div>
+            )}
+          </div>
+        )}
 
-      {tab === 'scorecard' && <ScorecardView />}
+        {tab === 'allLeads' && <AllLeadsView />}
 
-      {templatesOpen && profile?.role === 'rus' && (
-        <TemplateEditor onClose={() => setTemplatesOpen(false)} />
-      )}
+        {tab === 'scorecard' && <ScorecardView />}
+      </div>
+
+      {templatesOpen && <TemplateEditor onClose={() => setTemplatesOpen(false)} />}
     </div>
   )
 }

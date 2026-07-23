@@ -57,14 +57,12 @@ export default function TopBar({ onOpenTemplates }: TopBarProps) {
           <UserChip initials="SC" dotColor="green" active={profile?.role === 'coordinator'} />
         </div>
 
-        {profile?.role === 'rus' && (
-          <button
-            onClick={onOpenTemplates}
-            className="micro-label text-white/60 transition-colors hover:text-brand-gold"
-          >
-            Templates
-          </button>
-        )}
+        <button
+          onClick={onOpenTemplates}
+          className="micro-label text-white/60 transition-colors hover:text-brand-gold"
+        >
+          Templates
+        </button>
 
         <button
           onClick={toggle}
