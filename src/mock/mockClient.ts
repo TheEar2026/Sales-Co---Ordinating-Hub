@@ -134,8 +134,12 @@ function scorecard(): Row[] {
         leads.filter((l) => l.status === 'won').map((l) => l.school_name.trim().toLowerCase()),
       ).size,
       motion_a_pipeline: leads.filter((l) => l.motion === 'A' && !OPEN_EXCLUDED.includes(l.status)).length,
-      motion_b_untouched: leads.filter((l) => l.motion === 'B' && l.status === 'untouched').length,
-      motion_b_touched: leads.filter((l) => l.motion === 'B' && l.status !== 'untouched').length,
+      motion_b_untouched: leads.filter(
+        (l) => l.motion === 'B' && l.status === 'untouched' && l.priority_band !== 5,
+      ).length,
+      motion_b_touched: leads.filter(
+        (l) => l.motion === 'B' && l.status !== 'untouched' && l.priority_band !== 5,
+      ).length,
       sponsor_slots_placed: store.sponsorship_slots.filter((s) => s.status === 'placed').length,
       sponsor_slots_total: store.sponsorship_slots.length,
       pending_handovers: leads.filter((l) => l.status === 'reply-received' && l.owner === 'rus').length,

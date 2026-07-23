@@ -93,6 +93,11 @@ editor. Data resets on page refresh. Demo mode is off unless
      `priority_band` / `data_completeness`, and reorders the Motion B
      fresh-T1 queue by ISASA band/completeness (Band 5/RED excluded
      entirely). Requires the ISASA backfill (see below) to populate.
+   - `supabase_schema_patch_10.sql` — fixes `scorecard.motion_b_untouched`/
+     `motion_b_touched` to also exclude Band 5 leads, matching what
+     `motion_b_daily` shows — without this, the Scorecard tile and the
+     Motion B tab disagree on the untouched count by exactly the Band 5
+     total.
 2. **Create the two users** in Supabase Auth → Users (Rus and the
    coordinator), then insert their rows into `public.users` with the
    matching `id`, `email`, `full_name`, and `role`.
@@ -238,6 +243,7 @@ supabase_schema_patch_6.sql             corrective patch (paying_schools counts 
 supabase_schema_patch_7.sql             corrective patch (paying_schools case/whitespace-insensitive)
 supabase_schema_patch_8.sql             additive patch (leads.contact_phone)
 supabase_schema_patch_9.sql             additive + corrective patch (ISASA priority columns, motion_b_daily reorder, scorecard isasa metrics)
+supabase_schema_patch_10.sql            corrective patch (scorecard motion_b_untouched/touched exclude Band 5)
 ```
 
 ## End-to-end test (once live)
