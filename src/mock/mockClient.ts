@@ -97,13 +97,29 @@ function motionBDaily(): Row[] {
         l.motion === 'B' &&
         l.owner === 'coordinator' &&
         ['untouched', 't1-sent', 't2-sent', 'reply-received'].includes(l.status) &&
+        (l.priority_band == null || l.priority_band !== 5) &&
         (['untouched', 'reply-received'].includes(l.status) ||
           (l.next_touch_date != null && l.next_touch_date <= today)),
     )
     .map((l) => ({ ...l, queue_order: order(l) }))
     .sort((a, b) => {
       if (a.queue_order !== b.queue_order) return a.queue_order - b.queue_order
-      return (a.next_touch_date ?? '9999').localeCompare(b.next_touch_date ?? '9999')
+      // ISASA band/completeness ordering applies only within the
+      // untouched (fresh T1) bucket — mirrors motion_b_daily's ORDER BY.
+      if (a.queue_order === 1) {
+        const aIsasa = a.is_isasa ? 0 : 1
+        const bIsasa = b.is_isasa ? 0 : 1
+        if (aIsasa !== bIsasa) return aIsasa - bIsasa
+        const aBand = a.priority_band ?? Infinity
+        const bBand = b.priority_band ?? Infinity
+        if (aBand !== bBand) return aBand - bBand
+        if (a.data_completeness !== b.data_completeness) return b.data_completeness - a.data_completeness
+      }
+      if (a.queue_order === 2 || a.queue_order === 3) {
+        const cmp = (a.next_touch_date ?? '9999').localeCompare(b.next_touch_date ?? '9999')
+        if (cmp !== 0) return cmp
+      }
+      return a.school_name.localeCompare(b.school_name)
     }) as unknown as Row[]
 }
 
@@ -125,6 +141,8 @@ function scorecard(): Row[] {
       pending_handovers: leads.filter((l) => l.status === 'reply-received' && l.owner === 'rus').length,
       reply_rate_90d: recent.length ? Math.round((replied / recent.length) * 1000) / 10 : null,
       needs_review_count: leads.filter((l) => l.needs_review).length,
+      isasa_touched: leads.filter((l) => l.is_isasa && l.priority_band !== 5 && l.status !== 'untouched').length,
+      isasa_total: leads.filter((l) => l.is_isasa && l.priority_band !== 5).length,
     },
   ]
 }

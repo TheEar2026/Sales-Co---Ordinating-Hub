@@ -56,6 +56,9 @@ function lead(partial: Partial<Lead> & Pick<Lead, 'contact_name' | 'school_name'
     ac_deal_currency: null,
     needs_review: false,
     review_reason: null,
+    is_isasa: false,
+    priority_band: null,
+    data_completeness: 0,
     next_touch_date: null,
     demo_date: null,
     demo_booked_by: null,
@@ -204,6 +207,9 @@ export const mockLeads: Lead[] = [
     contact_role: 'Head of Academics',
     school_name: 'Winelands College',
     persona: 'P2',
+    is_isasa: true,
+    priority_band: 3,
+    data_completeness: 6,
     notes: 'One overstretched music teacher covering Gr 1–7. Choir strong, theory weak.',
   }),
   lead({
@@ -212,7 +218,31 @@ export const mockLeads: Lead[] = [
     contact_role: 'Principal',
     school_name: 'Horizon Academy',
     persona: 'P3',
+    is_isasa: true,
+    priority_band: 1,
+    data_completeness: 2,
     notes: 'Occasional music via external tutor — inconsistent. Fee-paying, mid-tier.',
+  }),
+  // ISASA Band 1, higher data_completeness than Horizon Academy — should
+  // rank above it despite both being Band 1 (completeness tiebreak).
+  lead({
+    contact_name: 'Please confirm Lead',
+    school_name: 'Little Sprouts Independent Primary',
+    school_province: 'Free State',
+    is_isasa: true,
+    priority_band: 1,
+    data_completeness: 6,
+    notes: 'ISASA Band 1 — small non-metro primary, practice pool.',
+  }),
+  // ISASA Band 5 (RED/do-not-contact) — must never appear in the queue,
+  // regardless of status. Verifies the exclusion.
+  lead({
+    contact_name: 'Please confirm Lead',
+    school_name: 'Harborview College (existing customer)',
+    is_isasa: true,
+    priority_band: 5,
+    data_completeness: 6,
+    notes: 'ISASA Band 5 — active deal, Rus is handling. Must not appear in Motion B queue.',
   }),
   // ---- Motion B: T2 follow-ups due today ----
   lead({

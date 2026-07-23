@@ -88,6 +88,11 @@ editor. Data resets on page refresh. Demo mode is off unless
      `paying_schools` on the `scorecard` view to count distinct schools
      (case/whitespace-insensitive), not raw won-lead rows — one school
      with multiple won contacts was being counted multiple times.
+   - `supabase_schema_patch_8.sql` — adds `leads.contact_phone`.
+   - `supabase_schema_patch_9.sql` — adds `leads.is_isasa` /
+     `priority_band` / `data_completeness`, and reorders the Motion B
+     fresh-T1 queue by ISASA band/completeness (Band 5/RED excluded
+     entirely). Requires the ISASA backfill (see below) to populate.
 2. **Create the two users** in Supabase Auth → Users (Rus and the
    coordinator), then insert their rows into `public.users` with the
    matching `id`, `email`, `full_name`, and `role`.
@@ -231,6 +236,8 @@ supabase_schema_patch_4.sql             corrective patch (motion_b_daily shows r
 supabase_schema_patch_5.sql             corrective patch (motion_a_daily filters on motion + owner)
 supabase_schema_patch_6.sql             corrective patch (paying_schools counts distinct schools)
 supabase_schema_patch_7.sql             corrective patch (paying_schools case/whitespace-insensitive)
+supabase_schema_patch_8.sql             additive patch (leads.contact_phone)
+supabase_schema_patch_9.sql             additive + corrective patch (ISASA priority columns, motion_b_daily reorder, scorecard isasa metrics)
 ```
 
 ## End-to-end test (once live)

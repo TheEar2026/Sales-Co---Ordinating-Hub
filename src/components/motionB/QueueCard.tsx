@@ -1,5 +1,6 @@
 import type { MotionBDailyLead } from '../../types'
 import Icon from '../shared/Icon'
+import IsasaBadge from '../shared/IsasaBadge'
 
 interface QueueCardProps {
   lead: MotionBDailyLead
@@ -28,7 +29,10 @@ export default function QueueCard({ lead, selected, done, onClick }: QueueCardPr
           {lead.needs_review && <Icon name="warning" size={12} filled className="shrink-0 text-amber" />}
           <span className="truncate text-body-sm font-bold text-ink">{lead.contact_name}</span>
         </div>
-        <div className="truncate micro-label mt-0.5 text-muted">{lead.school_name}</div>
+        <div className="flex items-center gap-1.5">
+          <span className="truncate micro-label mt-0.5 text-muted">{lead.school_name}</span>
+          <IsasaBadge isIsasa={lead.is_isasa} band={lead.priority_band} />
+        </div>
       </div>
       {lead.persona && (
         <span className="shrink-0 rounded bg-soft px-1.5 py-0.5 text-[10px] font-bold text-muted">

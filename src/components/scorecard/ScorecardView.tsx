@@ -84,6 +84,13 @@ export default function ScorecardView() {
         <MetricCard label="Motion A pipeline" value={scorecard.motion_a_pipeline} icon="analytics" valueClass="text-gold-mid" />
         <MetricCard label="Motion B untouched" value={scorecard.motion_b_untouched} icon="mark_email_unread" />
         <MetricCard
+          label="ISASA pool progress"
+          value={`${scorecard.isasa_touched}/${scorecard.isasa_total}`}
+          icon="groups"
+          progressPct={scorecard.isasa_total > 0 ? (scorecard.isasa_touched / scorecard.isasa_total) * 100 : 0}
+          tooltip="ISASA schools in the Motion B pool that Badi has sent at least one T1 to."
+        />
+        <MetricCard
           label="Sponsor slots placed"
           value={`${scorecard.sponsor_slots_placed}/${scorecard.sponsor_slots_total}`}
           icon="campaign"

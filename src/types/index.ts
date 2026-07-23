@@ -78,6 +78,10 @@ export interface Lead {
   needs_review: boolean
   review_reason: string | null
 
+  is_isasa: boolean
+  priority_band: number | null
+  data_completeness: number
+
   created_at: string
   updated_at: string
 }
@@ -168,4 +172,6 @@ export interface Scorecard {
   pending_handovers: number
   reply_rate_90d: number | null
   needs_review_count: number
+  isasa_touched: number
+  isasa_total: number
 }

@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { VariableSizeList, type ListChildComponentProps } from 'react-window'
 import { AutoSizer } from 'react-virtualized-auto-sizer'
 import type { MotionBDailyLead } from '../../types'
@@ -29,9 +29,10 @@ type FlatRow = { type: 'header'; section: Section } | { type: 'lead'; lead: Moti
 
 export default function OutreachQueue({ leads, loading, selectedId, doneIds, onSelect }: OutreachQueueProps) {
   const { scorecard } = useScorecard()
+  const [isasaOnly, setIsasaOnly] = useState(false)
 
   const replied = leads.filter((l) => l.status === 'reply-received')
-  const t1s = leads.filter((l) => l.status === 'untouched')
+  const t1s = leads.filter((l) => l.status === 'untouched' && (!isasaOnly || l.is_isasa))
   const t2s = leads.filter((l) => l.status === 't1-sent')
   const t3s = leads.filter((l) => l.status === 't2-sent')
 
@@ -99,6 +100,16 @@ export default function OutreachQueue({ leads, loading, selectedId, doneIds, onS
           <span>T2: {t2s.length}</span>
           <span>T3: {t3s.length}</span>
         </div>
+
+        <label className="mt-2 flex items-center gap-1.5 text-body-sm text-muted">
+          <input
+            type="checkbox"
+            checked={isasaOnly}
+            onChange={(e) => setIsasaOnly(e.target.checked)}
+            className="h-3.5 w-3.5 rounded border-line accent-green"
+          />
+          ISASA only
+        </label>
 
         <p className="mt-2 flex items-center gap-1 text-body-sm text-amber">
           <Icon name="warning" size={15} filled /> Steady-state grows to ~12/day from Week 3
