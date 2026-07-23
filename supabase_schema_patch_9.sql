@@ -23,8 +23,16 @@ alter table leads add column if not exists is_isasa boolean not null default fal
 alter table leads add column if not exists priority_band smallint;
 alter table leads add column if not exists data_completeness smallint not null default 0;
 
-alter table leads add constraint priority_band_range
-  check (priority_band is null or priority_band between 1 and 5);
+-- Wrapped so re-running this patch after a partial failure doesn't
+-- error on "constraint already exists" (unlike add column, Postgres has
+-- no `add constraint if not exists`).
+do $$
+begin
+  alter table leads add constraint priority_band_range
+    check (priority_band is null or priority_band between 1 and 5);
+exception
+  when duplicate_object then null;
+end $$;
 
 create index if not exists idx_leads_motion_b_priority
   on leads (is_isasa desc, priority_band asc nulls last, data_completeness desc, school_name asc)
@@ -33,36 +41,47 @@ create index if not exists idx_leads_motion_b_priority
 -- The leads table just gained 3 columns, which shifts where l.* lands —
 -- `create or replace view` refuses that kind of shape change (same
 -- reason patch 4 had to drop+recreate this view), so drop and recreate.
+--
+-- Wrapped in a subquery: Postgres only resolves a SELECT-list alias
+-- (queue_order) as a bare ORDER BY item, not when it's referenced inside
+-- a CASE expression in ORDER BY — that lookup happens against the
+-- FROM-clause's real columns instead, and queue_order isn't one (it
+-- errors "column queue_order does not exist"). Wrapping the case/from/
+-- where in a derived table makes queue_order a genuine output column of
+-- that table, so it can be referenced anywhere in the outer ORDER BY.
 drop view if exists motion_b_daily;
 create view motion_b_daily as
-select
-  l.*,
-  case
-    when l.status = 'reply-received' then 0   -- needs handover now — always first
-    when l.status = 'untouched'      then 1
-    when l.status = 't1-sent'        then 2
-    when l.status = 't2-sent'        then 3
-    else                                   4
-  end as queue_order
-from leads l
-where l.motion = 'B'
-  and l.owner = 'coordinator'
-  and l.status in ('untouched', 't1-sent', 't2-sent', 'reply-received')
-  and (l.priority_band is null or l.priority_band != 5)   -- Band 5 = RED, never shown
-  and (
-    l.status in ('untouched', 'reply-received')   -- always show, regardless of date
-    or l.next_touch_date <= current_date          -- t1/t2 follow-ups: only when due
-  )
+select *
+from (
+  select
+    l.*,
+    case
+      when l.status = 'reply-received' then 0   -- needs handover now — always first
+      when l.status = 'untouched'      then 1
+      when l.status = 't1-sent'        then 2
+      when l.status = 't2-sent'        then 3
+      else                                   4
+    end as queue_order
+  from leads l
+  where l.motion = 'B'
+    and l.owner = 'coordinator'
+    and l.status in ('untouched', 't1-sent', 't2-sent', 'reply-received')
+    and (l.priority_band is null or l.priority_band != 5)   -- Band 5 = RED, never shown
+    and (
+      l.status in ('untouched', 'reply-received')   -- always show, regardless of date
+      or l.next_touch_date <= current_date          -- t1/t2 follow-ups: only when due
+    )
+) t
 order by
   queue_order,
   -- ISASA band/completeness ordering applies only within the untouched
   -- (fresh T1) bucket — an ISASA lead already at t1-sent/t2-sent must
   -- keep sorting by next_touch_date like every other follow-up.
-  case when queue_order = 1 then (case when l.is_isasa then 0 else 1 end) end,
-  case when queue_order = 1 then l.priority_band end nulls last,
-  case when queue_order = 1 then l.data_completeness end desc,
-  case when queue_order in (2, 3) then l.next_touch_date end asc nulls last,
-  l.school_name asc;
+  case when queue_order = 1 then (case when is_isasa then 0 else 1 end) end,
+  case when queue_order = 1 then priority_band end nulls last,
+  case when queue_order = 1 then data_completeness end desc,
+  case when queue_order in (2, 3) then next_touch_date end asc nulls last,
+  school_name asc;
 
 comment on view motion_b_daily is 'Coordinator''s daily outreach queue. Shows untouched T1 leads (ISASA leads first, ordered by priority_band then data_completeness), follow-ups due today or overdue (ordered by next_touch_date, unaffected by ISASA status), and any lead whose reply was auto-detected and is awaiting handover confirmation. Band 5 (RED/do-not-contact) ISASA leads are excluded entirely.';
 
