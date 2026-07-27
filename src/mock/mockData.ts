@@ -156,6 +156,7 @@ export const mockLeads: Lead[] = [
     ac_deal_value: 30000,
     touch_count: 5,
     last_touch_date: daysAgo(65),
+    next_touch_date: daysAgo(1),
     notes: `[${daysAgo(65)}] Demo went fine but budget frozen until new financial year.`,
     next_action: 'Re-qualify — over 60 days silent.',
   }),

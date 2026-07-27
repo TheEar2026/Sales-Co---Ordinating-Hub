@@ -98,6 +98,11 @@ editor. Data resets on page refresh. Demo mode is off unless
      `motion_b_daily` shows — without this, the Scorecard tile and the
      Motion B tab disagree on the untouched count by exactly the Band 5
      total.
+   - `supabase_schema_patch_11.sql` — adds `needs_followup` to
+     `motion_a_daily` and makes it the top-level sort bucket: a lead
+     whose "Next touch" date has arrived (or passed) always surfaces
+     before the rest of the list, instead of only rising gradually via
+     days-since-last-touch. Also shows a "Follow up" badge on the card.
 2. **Create the two users** in Supabase Auth → Users (Rus and the
    coordinator), then insert their rows into `public.users` with the
    matching `id`, `email`, `full_name`, and `role`.
@@ -244,6 +249,7 @@ supabase_schema_patch_7.sql             corrective patch (paying_schools case/wh
 supabase_schema_patch_8.sql             additive patch (leads.contact_phone)
 supabase_schema_patch_9.sql             additive + corrective patch (ISASA priority columns, motion_b_daily reorder, scorecard isasa metrics)
 supabase_schema_patch_10.sql            corrective patch (scorecard motion_b_untouched/touched exclude Band 5)
+supabase_schema_patch_11.sql            corrective patch (motion_a_daily needs_followup gating + badge)
 ```
 
 ## End-to-end test (once live)

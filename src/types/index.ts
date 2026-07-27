@@ -88,6 +88,7 @@ export interface Lead {
 
 export interface MotionADailyLead extends Lead {
   days_since_last_touch: number | null
+  needs_followup: boolean
   priority_order: number
 }
 

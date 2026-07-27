@@ -69,14 +69,19 @@ function motionADaily(): Row[] {
     if (l.tier === 'HOT') return 7
     return 8
   }
+  const today = todayStr()
   return (store.leads as unknown as Lead[])
-    .filter((l) => l.owner === 'rus' && !OPEN_EXCLUDED.includes(l.status))
+    .filter((l) => l.motion === 'A' && l.owner === 'rus' && !OPEN_EXCLUDED.includes(l.status))
     .map((l) => ({
       ...l,
       days_since_last_touch: l.last_touch_date ? daysBetween(l.last_touch_date) : null,
+      needs_followup: l.next_touch_date != null && l.next_touch_date <= today,
       priority_order: priority(l),
     }))
     .sort((a, b) => {
+      const aDue = a.needs_followup ? 0 : 1
+      const bDue = b.needs_followup ? 0 : 1
+      if (aDue !== bDue) return aDue - bDue
       if (a.priority_order !== b.priority_order) return a.priority_order - b.priority_order
       return (b.days_since_last_touch ?? -1) - (a.days_since_last_touch ?? -1)
     }) as unknown as Row[]
