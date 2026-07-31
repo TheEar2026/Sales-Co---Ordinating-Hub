@@ -1,5 +1,6 @@
 import type { MotionADailyLead } from '../../types'
 import TierBadge from '../shared/TierBadge'
+import StatusChip from '../shared/StatusChip'
 import Icon from '../shared/Icon'
 
 function formatZAR(value: number | null): string {
@@ -51,10 +52,15 @@ export default function LeadCard({ lead, selected, onClick }: LeadCardProps) {
             <TierBadge tier={lead.tier} />
           </div>
         </div>
-        {lead.needs_followup && (
-          <span className="mb-1 inline-flex items-center gap-1 rounded-full bg-amber-light px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-amber">
-            <Icon name="notifications_active" size={10} filled /> Follow up
-          </span>
+        {(lead.status === 'reply-received' || lead.needs_followup) && (
+          <div className="mb-1 flex flex-wrap items-center gap-1">
+            {lead.status === 'reply-received' && <StatusChip status={lead.status} />}
+            {lead.needs_followup && (
+              <span className="inline-flex items-center gap-1 rounded-full bg-amber-light px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-amber">
+                <Icon name="notifications_active" size={10} filled /> Follow up
+              </span>
+            )}
+          </div>
         )}
         <p className="micro-label mb-2 truncate text-muted">{lead.school_name}</p>
         <div className="flex items-center justify-between">

@@ -355,7 +355,19 @@ function handleHandoverRpc(params: Row): { error: { message: string } | null } {
   lead.demo_date = event.demo_date
   lead.demo_booked_by = 'coordinator'
   lead.last_reply_date = todayStr()
+  lead.first_reply_date = lead.first_reply_date ?? todayStr()
   lead.updated_at = new Date().toISOString()
+
+  // Mirror handle_handover()'s touch_log fix — mark the most recent
+  // touch for this lead as replied, so reply_rate_90d isn't stuck at 0%
+  // in demo mode either.
+  const leadTouches = (store.touch_log as unknown as TouchLog[])
+    .filter((t) => t.lead_id === lead.id)
+    .sort((a, b) => (b.sent_date === a.sent_date ? 0 : b.sent_date > a.sent_date ? 1 : -1))
+  if (leadTouches[0]) {
+    leadTouches[0].replied = true
+    leadTouches[0].reply_date = todayStr()
+  }
 
   emitChange('handover_events', 'INSERT', event as unknown as Row)
   emitChange('leads', 'UPDATE', lead as unknown as Row)

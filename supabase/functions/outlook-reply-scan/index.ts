@@ -194,6 +194,23 @@ async function processMailbox(
       // Set once, never overwritten on subsequent replies.
       await supabase.from("leads").update({ first_reply_date: today }).eq("id", lead.id).is("first_reply_date", null);
 
+      // Mark the touch that got the reply — nothing else in the system
+      // ever sets touch_log.replied, which pinned scorecard.reply_rate_90d
+      // at 0% regardless of real replies. touch_log stays insert-only for
+      // the send record itself; this only records the outcome on the most
+      // recent row for this lead.
+      const { data: latestTouch } = await supabase
+        .from("touch_log")
+        .select("id")
+        .eq("lead_id", lead.id)
+        .order("sent_date", { ascending: false })
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      if (latestTouch) {
+        await supabase.from("touch_log").update({ replied: true, reply_date: today }).eq("id", latestTouch.id);
+      }
+
       await logReply({
         mailbox: mailboxLabel,
         leadId: lead.id,

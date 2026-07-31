@@ -103,6 +103,14 @@ editor. Data resets on page refresh. Demo mode is off unless
      whose "Next touch" date has arrived (or passed) always surfaces
      before the rest of the list, instead of only rising gradually via
      days-since-last-touch. Also shows a "Follow up" badge on the card.
+   - `supabase_schema_patch_12.sql` — fixes `handle_handover()` to mark
+     the relevant `touch_log` row as `replied = true` (nothing ever did
+     this before, so `scorecard.reply_rate_90d` was structurally pinned
+     at 0% regardless of real replies), backfills existing replies, and
+     sets `first_reply_date` on handover for consistency with the
+     manual reply-confirm flow. A matching fix is needed in
+     `supabase/functions/outlook-reply-scan/index.ts` for the
+     auto-detect path — deploy that separately.
 2. **Create the two users** in Supabase Auth → Users (Rus and the
    coordinator), then insert their rows into `public.users` with the
    matching `id`, `email`, `full_name`, and `role`.
@@ -250,6 +258,7 @@ supabase_schema_patch_8.sql             additive patch (leads.contact_phone)
 supabase_schema_patch_9.sql             additive + corrective patch (ISASA priority columns, motion_b_daily reorder, scorecard isasa metrics)
 supabase_schema_patch_10.sql            corrective patch (scorecard motion_b_untouched/touched exclude Band 5)
 supabase_schema_patch_11.sql            corrective patch (motion_a_daily needs_followup gating + badge)
+supabase_schema_patch_12.sql            corrective patch (handle_handover marks touch_log.replied, backfill, first_reply_date)
 ```
 
 ## End-to-end test (once live)

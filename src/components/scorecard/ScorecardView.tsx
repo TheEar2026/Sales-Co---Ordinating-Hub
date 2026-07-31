@@ -4,6 +4,7 @@ import { useScorecard } from '../../hooks/useScorecard'
 import type { LeadStatus } from '../../types'
 import MetricCard from './MetricCard'
 import CloseList from './CloseList'
+import PendingHandoversList from './PendingHandoversList'
 import LoadingSpinner from '../shared/LoadingSpinner'
 
 const YEAR_TARGET = 60
@@ -100,7 +101,12 @@ export default function ScorecardView() {
           value={scorecard.reply_rate_90d != null ? `${scorecard.reply_rate_90d}%` : '—'}
           icon="reply_all"
         />
-        <MetricCard label="Pending handovers" value={scorecard.pending_handovers} icon="assignment_turned_in" />
+        <MetricCard
+          label="Pending handovers"
+          value={scorecard.pending_handovers}
+          icon="assignment_turned_in"
+          tooltip="Replies Badi has confirmed and handed to you — action them from Motion A or the list below."
+        />
         <MetricCard
           label="Needs review"
           value={scorecard.needs_review_count}
@@ -112,6 +118,11 @@ export default function ScorecardView() {
       <div className="mb-8">
         <h3 className="micro-label mb-3 text-ink">CLOSE tier — Rus priority list</h3>
         <CloseList />
+      </div>
+
+      <div className="mb-8">
+        <h3 className="micro-label mb-3 text-ink">Pending handovers — replies Badi has flagged to you</h3>
+        <PendingHandoversList />
       </div>
 
       <div>
