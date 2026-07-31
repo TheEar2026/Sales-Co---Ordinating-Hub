@@ -64,7 +64,7 @@ export default function ComposePanel({ lead, onDone, onUpdated, onToast }: Compo
   const mergedSubject = selectedTemplate ? mergeTemplate(selectedTemplate.subject, lead) : ''
 
   async function markSent() {
-    if (!profile || !selectedTemplate) return
+    if (!profile) return
     setBusy(true)
     const today = new Date().toISOString().slice(0, 10)
 
@@ -73,7 +73,7 @@ export default function ComposePanel({ lead, onDone, onUpdated, onToast }: Compo
       touch_number: touchNumber,
       sent_by: profile.role,
       sent_date: today,
-      template_id: selectedTemplate.id,
+      template_id: selectedTemplate?.id ?? null,
     })
 
     await supabase
@@ -225,7 +225,7 @@ export default function ComposePanel({ lead, onDone, onUpdated, onToast }: Compo
             {!hasReplied && (
               <button
                 onClick={markSent}
-                disabled={busy || !selectedTemplate}
+                disabled={busy}
                 className="flex items-center gap-1.5 rounded bg-green px-4 py-2 text-body-sm font-bold text-white transition-opacity hover:opacity-90 disabled:opacity-50"
               >
                 <Icon name="check_circle" size={18} /> Sent — mark done

@@ -194,6 +194,15 @@ export const mockLeads: Lead[] = [
   }),
 
   // ---- Motion B: coordinator queue — T1s (untouched) ----
+  // No persona confirmed yet — no active template exists for this
+  // persona/touch combination, so "Sent — mark done" must still work.
+  lead({
+    contact_name: 'Please confirm Lead',
+    contact_role: 'Receptionist',
+    school_name: 'Berea Christian School',
+    school_province: 'KwaZulu-Natal',
+    notes: 'Sue mentioned their drama teacher, Stacey, handles both music and creative arts.',
+  }),
   lead({
     contact_name: 'Thandi Mahlangu',
     contact_email: 'tmahlangu@sunnysideprimary.co.za',
