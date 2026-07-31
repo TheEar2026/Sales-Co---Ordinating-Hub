@@ -1,12 +1,21 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../../lib/supabase'
-import type { Lead } from '../../types'
+import type { Lead, PersonaCode } from '../../types'
 
 interface ContactFieldsEditorProps {
-  lead: Pick<Lead, 'id' | 'contact_name' | 'contact_role' | 'contact_email' | 'contact_phone'>
+  lead: Pick<Lead, 'id' | 'contact_name' | 'contact_role' | 'contact_email' | 'contact_phone' | 'persona'>
   canEdit: boolean
   onUpdated: () => void
 }
+
+const PERSONA_OPTIONS: { value: PersonaCode; label: string }[] = [
+  { value: 'P1', label: 'P1 — Established Music Dept' },
+  { value: 'P2', label: 'P2 — Overstretched Music Dept' },
+  { value: 'P3', label: 'P3 — Partial/Inconsistent Offering' },
+  { value: 'P4', label: 'P4 — No Music (Values/Enrichment)' },
+  { value: 'P5', label: 'P5 — Budget-Constrained' },
+  { value: 'P6', label: 'P6 — School Group' },
+]
 
 interface FieldProps {
   label: string
@@ -68,6 +77,14 @@ export default function ContactFieldsEditor({ lead, canEdit, onUpdated }: Contac
     onUpdated()
   }
 
+  async function savePersona(value: string) {
+    if (!canEdit) return
+    const normalized = (value || null) as PersonaCode | null
+    if (normalized === lead.persona) return
+    await supabase.from('leads').update({ persona: normalized }).eq('id', lead.id)
+    onUpdated()
+  }
+
   return (
     <div className="grid grid-cols-2 gap-x-4 gap-y-5 sm:grid-cols-4">
       <Field
@@ -102,6 +119,25 @@ export default function ContactFieldsEditor({ lead, canEdit, onUpdated }: Contac
         onBlur={() => saveField('contact_phone', phone, lead.contact_phone, true)}
         type="tel"
       />
+      <div>
+        <h3 className="micro-label mb-1 text-muted">Persona</h3>
+        {canEdit ? (
+          <select
+            value={lead.persona ?? ''}
+            onChange={(e) => savePersona(e.target.value)}
+            className="w-full rounded border border-line bg-soft px-2 py-1.5 text-body-sm text-ink focus:outline-none focus:ring-2 focus:ring-gold"
+          >
+            <option value="">Not set — research needed</option>
+            {PERSONA_OPTIONS.map((opt) => (
+              <option key={opt.value} value={opt.value}>
+                {opt.label}
+              </option>
+            ))}
+          </select>
+        ) : (
+          <p className="text-body-sm text-ink">{lead.persona ?? '—'}</p>
+        )}
+      </div>
     </div>
   )
 }
