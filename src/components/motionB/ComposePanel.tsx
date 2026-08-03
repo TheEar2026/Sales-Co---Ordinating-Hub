@@ -13,13 +13,20 @@ import HandoverModal from './HandoverModal'
 function touchNumberForStatus(status: MotionBDailyLead['status']): TouchNumber {
   if (status === 'untouched') return 'T1'
   if (status === 't1-sent') return 'T2'
-  return 'T3'
+  if (status === 't2-sent') return 'T3'
+  if (status === 't3-sent') return 'T4'
+  // t4-sent and t5-sent both show/behave as T5 — the sequence caps
+  // here (temporary, per Rus) rather than opening a T6; sending again
+  // from t5-sent logs another T5 touch and stays at t5-sent.
+  return 'T5'
 }
 
 function nextStatusForTouch(touchNumber: TouchNumber): MotionBDailyLead['status'] {
   if (touchNumber === 'T1') return 't1-sent'
   if (touchNumber === 'T2') return 't2-sent'
-  return 't3-sent'
+  if (touchNumber === 'T3') return 't3-sent'
+  if (touchNumber === 'T4') return 't4-sent'
+  return 't5-sent'
 }
 
 interface ComposePanelProps {

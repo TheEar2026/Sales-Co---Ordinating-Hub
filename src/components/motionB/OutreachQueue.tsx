@@ -20,6 +20,7 @@ interface OutreachQueueProps {
 
 interface Section {
   key: string
+  stage: 'replied' | 't1' | 't2' | 't3' | 't4' | 't5'
   title: string
   dividerClass: string
   leads: MotionBDailyLead[]
@@ -27,7 +28,7 @@ interface Section {
 
 type FlatRow = { type: 'header'; section: Section } | { type: 'lead'; lead: MotionBDailyLead }
 
-type StageFilter = 'all' | 'replied' | 't1' | 't2' | 't3'
+type StageFilter = 'all' | 'replied' | 't1' | 't2' | 't3' | 't4' | 't5'
 
 export default function OutreachQueue({ leads, loading, selectedId, doneIds, onSelect }: OutreachQueueProps) {
   const { scorecard } = useScorecard()
@@ -38,18 +39,103 @@ export default function OutreachQueue({ leads, loading, selectedId, doneIds, onS
   const t1s = leads.filter((l) => l.status === 'untouched' && (!isasaOnly || l.is_isasa))
   const t2s = leads.filter((l) => l.status === 't1-sent')
   const t3s = leads.filter((l) => l.status === 't2-sent')
+  // t3-sent/t4-sent/t5-sent are the temporary T4/T5 stopgap (see
+  // supabase_schema_patch_14.sql) — t5-sent has no automated next
+  // step, it just stays visible here until parked.
+  const t4s = leads.filter((l) => l.status === 't3-sent')
+  const t5s = leads.filter((l) => l.status === 't4-sent' || l.status === 't5-sent')
+
+  // T2-T5 are split into "send today" vs "scheduled" sub-sections so a
+  // due lead is structurally separated from a not-yet-due one, rather
+  // than merely sorted first within one mixed list — a due lead is
+  // easy to skim past in a long list, impossible to miss under its own
+  // header.
+  const t2Due = t2s.filter((l) => l.needs_followup_now)
+  const t2Scheduled = t2s.filter((l) => !l.needs_followup_now)
+  const t3Due = t3s.filter((l) => l.needs_followup_now)
+  const t3Scheduled = t3s.filter((l) => !l.needs_followup_now)
+  const t4Due = t4s.filter((l) => l.needs_followup_now)
+  const t4Scheduled = t4s.filter((l) => !l.needs_followup_now)
+  const t5Due = t5s.filter((l) => l.needs_followup_now)
+  const t5Scheduled = t5s.filter((l) => !l.needs_followup_now)
 
   const sections: Section[] = [
-    { key: 'replied', title: 'Replied — confirm handover', dividerClass: 'bg-green/10 text-green', leads: replied },
-    { key: 't1', title: 'T1s — first touch today', dividerClass: 'bg-chrome text-white', leads: t1s },
-    { key: 't2', title: 'T2 follow-ups due today', dividerClass: 'bg-amber-light text-amber', leads: t2s },
-    { key: 't3', title: 'T3 follow-ups due today', dividerClass: 'bg-soft text-muted', leads: t3s },
+    {
+      key: 'replied',
+      stage: 'replied',
+      title: `Replied — confirm handover (${replied.length})`,
+      dividerClass: 'bg-green/10 text-green',
+      leads: replied,
+    },
+    {
+      key: 't1',
+      stage: 't1',
+      title: `T1s — first touch today (${t1s.length})`,
+      dividerClass: 'bg-chrome text-white',
+      leads: t1s,
+    },
+    {
+      key: 't2-due',
+      stage: 't2',
+      title: `T2 — send today (${t2Due.length})`,
+      dividerClass: 'bg-amber-light text-amber',
+      leads: t2Due,
+    },
+    {
+      key: 't2-scheduled',
+      stage: 't2',
+      title: `T2 — scheduled (${t2Scheduled.length})`,
+      dividerClass: 'bg-soft text-muted',
+      leads: t2Scheduled,
+    },
+    {
+      key: 't3-due',
+      stage: 't3',
+      title: `T3 — send today (${t3Due.length})`,
+      dividerClass: 'bg-amber-light text-amber',
+      leads: t3Due,
+    },
+    {
+      key: 't3-scheduled',
+      stage: 't3',
+      title: `T3 — scheduled (${t3Scheduled.length})`,
+      dividerClass: 'bg-soft text-muted',
+      leads: t3Scheduled,
+    },
+    {
+      key: 't4-due',
+      stage: 't4',
+      title: `T4 — send today (${t4Due.length})`,
+      dividerClass: 'bg-amber-light text-amber',
+      leads: t4Due,
+    },
+    {
+      key: 't4-scheduled',
+      stage: 't4',
+      title: `T4 — scheduled (${t4Scheduled.length})`,
+      dividerClass: 'bg-soft text-muted',
+      leads: t4Scheduled,
+    },
+    {
+      key: 't5-due',
+      stage: 't5',
+      title: `T5 — send today (${t5Due.length})`,
+      dividerClass: 'bg-amber-light text-amber',
+      leads: t5Due,
+    },
+    {
+      key: 't5-scheduled',
+      stage: 't5',
+      title: `T5 — scheduled (${t5Scheduled.length})`,
+      dividerClass: 'bg-soft text-muted',
+      leads: t5Scheduled,
+    },
   ]
 
   // Filtering `sections` (not the replied/t1s/t2s/t3s arrays feeding the
   // count badges below) keeps those counts showing true totals no matter
   // which stage is selected — this is purely a display filter.
-  const visibleSections = stageFilter === 'all' ? sections : sections.filter((s) => s.key === stageFilter)
+  const visibleSections = stageFilter === 'all' ? sections : sections.filter((s) => s.stage === stageFilter)
 
   const touched = scorecard?.motion_b_touched ?? 0
   const totalPool = touched + (scorecard?.motion_b_untouched ?? 0)
@@ -126,6 +212,12 @@ export default function OutreachQueue({ leads, loading, selectedId, doneIds, onS
           </button>
           <button onClick={() => setStageFilter('t3')} className={stageFilter === 't3' ? 'font-bold text-ink underline' : ''}>
             T3: {t3s.length}
+          </button>
+          <button onClick={() => setStageFilter('t4')} className={stageFilter === 't4' ? 'font-bold text-ink underline' : ''}>
+            T4: {t4s.length}
+          </button>
+          <button onClick={() => setStageFilter('t5')} className={stageFilter === 't5' ? 'font-bold text-ink underline' : ''}>
+            T5: {t5s.length}
           </button>
         </div>
 

@@ -93,7 +93,10 @@ function motionBDaily(): Row[] {
     if (l.status === 'untouched') return 1
     if (l.status === 't1-sent') return 2
     if (l.status === 't2-sent') return 3
-    return 4
+    if (l.status === 't3-sent') return 4 // T4 due
+    if (l.status === 't4-sent') return 5 // T5 due
+    if (l.status === 't5-sent') return 6 // T5 sent, stays visible until parked
+    return 7
   }
   const today = todayStr()
   return (store.leads as unknown as Lead[])
@@ -101,12 +104,17 @@ function motionBDaily(): Row[] {
       (l) =>
         l.motion === 'B' &&
         l.owner === 'coordinator' &&
-        ['untouched', 't1-sent', 't2-sent', 'reply-received'].includes(l.status) &&
-        (l.priority_band == null || l.priority_band !== 5) &&
-        (['untouched', 'reply-received'].includes(l.status) ||
-          (l.next_touch_date != null && l.next_touch_date <= today)),
+        ['untouched', 't1-sent', 't2-sent', 't3-sent', 't4-sent', 't5-sent', 'reply-received'].includes(l.status) &&
+        (l.priority_band == null || l.priority_band !== 5),
+      // no next_touch_date gate anymore — a t1-sent through t5-sent
+      // lead stays visible regardless of date; needs_followup_now
+      // (below) flags urgency instead of hiding the lead
     )
-    .map((l) => ({ ...l, queue_order: order(l) }))
+    .map((l) => ({
+      ...l,
+      queue_order: order(l),
+      needs_followup_now: l.next_touch_date != null && l.next_touch_date <= today,
+    }))
     .sort((a, b) => {
       if (a.queue_order !== b.queue_order) return a.queue_order - b.queue_order
       // ISASA band/completeness ordering applies only within the
@@ -120,7 +128,7 @@ function motionBDaily(): Row[] {
         if (aBand !== bBand) return aBand - bBand
         if (a.data_completeness !== b.data_completeness) return b.data_completeness - a.data_completeness
       }
-      if (a.queue_order === 2 || a.queue_order === 3) {
+      if ([2, 3, 4, 5, 6].includes(a.queue_order)) {
         const cmp = (a.next_touch_date ?? '9999').localeCompare(b.next_touch_date ?? '9999')
         if (cmp !== 0) return cmp
       }

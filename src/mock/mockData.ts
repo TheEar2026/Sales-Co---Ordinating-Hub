@@ -311,6 +311,26 @@ export const mockLeads: Lead[] = [
     last_touch_date: daysAgo(3),
     next_touch_date: daysAgo(-3),
   }),
+  // T4/T5 temporary stopgap — leads that exhausted T1-T3 and used to
+  // vanish from the queue entirely (supabase_schema_patch_14.sql).
+  lead({
+    contact_name: 'Johan Bezuidenhout',
+    school_name: 'Vaalpark Combined School',
+    persona: 'P5',
+    status: 't3-sent',
+    touch_count: 3,
+    last_touch_date: daysAgo(5),
+    next_touch_date: today,
+  }),
+  lead({
+    contact_name: 'Precious Zulu',
+    school_name: 'Thabo Secondary',
+    persona: 'P4',
+    status: 't4-sent',
+    touch_count: 4,
+    last_touch_date: daysAgo(2),
+    next_touch_date: daysAgo(-2),
+  }),
   // Auto-detected by the Outlook reply scan — status flipped straight
   // to reply-received while still owned by the coordinator, awaiting
   // her handover confirmation.
@@ -340,6 +360,31 @@ export const mockLeads: Lead[] = [
     review_reason:
       "Auto-created from AC deal #1822 — no matching ac_deal_id found in Supabase. Verify contact and school details.",
     source: 'activecampaign',
+  }),
+  // Still in cold-outreach cadence (status stays 'untouched' — only
+  // touch_count/next_touch_date move via markContacted()) — exercises
+  // the "By touch stage" view's T-bucket splitting.
+  lead({
+    contact_name: 'Thabo Nkosi',
+    school_name: 'Silverleaf Academy',
+    motion: 'A',
+    owner: 'rus',
+    tier: null,
+    status: 'untouched',
+    touch_count: 2,
+    last_touch_date: daysAgo(5),
+    next_touch_date: today,
+  }),
+  lead({
+    contact_name: 'Bianca Roux',
+    school_name: 'Hilltop College',
+    motion: 'A',
+    owner: 'rus',
+    tier: null,
+    status: 'untouched',
+    touch_count: 2,
+    last_touch_date: daysAgo(2),
+    next_touch_date: daysAgo(-5),
   }),
 ]
 

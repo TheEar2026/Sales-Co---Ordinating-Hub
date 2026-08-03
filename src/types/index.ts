@@ -7,6 +7,8 @@ export type LeadStatus =
   | 't1-sent'
   | 't2-sent'
   | 't3-sent'
+  | 't4-sent'
+  | 't5-sent'
   | 'reply-received'
   | 'demo-booked'
   | 'demo-held'
@@ -94,6 +96,7 @@ export interface MotionADailyLead extends Lead {
 
 export interface MotionBDailyLead extends Lead {
   queue_order: number
+  needs_followup_now: boolean
 }
 
 export interface TouchLog {
