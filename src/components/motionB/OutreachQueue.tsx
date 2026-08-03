@@ -27,9 +27,12 @@ interface Section {
 
 type FlatRow = { type: 'header'; section: Section } | { type: 'lead'; lead: MotionBDailyLead }
 
+type StageFilter = 'all' | 'replied' | 't1' | 't2' | 't3'
+
 export default function OutreachQueue({ leads, loading, selectedId, doneIds, onSelect }: OutreachQueueProps) {
   const { scorecard } = useScorecard()
   const [isasaOnly, setIsasaOnly] = useState(false)
+  const [stageFilter, setStageFilter] = useState<StageFilter>('all')
 
   const replied = leads.filter((l) => l.status === 'reply-received')
   const t1s = leads.filter((l) => l.status === 'untouched' && (!isasaOnly || l.is_isasa))
@@ -43,11 +46,16 @@ export default function OutreachQueue({ leads, loading, selectedId, doneIds, onS
     { key: 't3', title: 'T3 follow-ups due today', dividerClass: 'bg-soft text-muted', leads: t3s },
   ]
 
+  // Filtering `sections` (not the replied/t1s/t2s/t3s arrays feeding the
+  // count badges below) keeps those counts showing true totals no matter
+  // which stage is selected — this is purely a display filter.
+  const visibleSections = stageFilter === 'all' ? sections : sections.filter((s) => s.key === stageFilter)
+
   const touched = scorecard?.motion_b_touched ?? 0
   const totalPool = touched + (scorecard?.motion_b_untouched ?? 0)
   const poolPct = totalPool > 0 ? Math.min(100, (touched / totalPool) * 100) : 0
 
-  const rows: FlatRow[] = sections.flatMap((section) =>
+  const rows: FlatRow[] = visibleSections.flatMap((section) =>
     section.leads.length > 0
       ? [{ type: 'header' as const, section }, ...section.leads.map((lead) => ({ type: 'lead' as const, lead }))]
       : [],
@@ -55,12 +63,13 @@ export default function OutreachQueue({ leads, loading, selectedId, doneIds, onS
 
   // VariableSizeList caches computed row offsets by index — when the
   // underlying leads change (a lead moves between sections, one gets
-  // added/removed), the header/lead layout at a given index can shift, so
-  // the cache must be explicitly invalidated rather than left stale.
+  // added/removed) or a filter changes which rows are visible, the
+  // header/lead layout at a given index can shift, so the cache must be
+  // explicitly invalidated rather than left stale.
   const listRef = useRef<VariableSizeList>(null)
   useEffect(() => {
     listRef.current?.resetAfterIndex(0)
-  }, [leads])
+  }, [leads, isasaOnly, stageFilter])
 
   function Row({ index, style }: ListChildComponentProps) {
     const row = rows[index]
@@ -95,10 +104,29 @@ export default function OutreachQueue({ leads, loading, selectedId, doneIds, onS
         </div>
 
         <div className="mt-3 flex gap-3 font-mono text-[12px] text-muted">
-          {replied.length > 0 && <span className="text-green">Replied: {replied.length}</span>}
-          <span>T1: {t1s.length}</span>
-          <span>T2: {t2s.length}</span>
-          <span>T3: {t3s.length}</span>
+          <button
+            onClick={() => setStageFilter('all')}
+            className={stageFilter === 'all' ? 'font-bold text-ink underline' : ''}
+          >
+            All
+          </button>
+          {replied.length > 0 && (
+            <button
+              onClick={() => setStageFilter('replied')}
+              className={`text-green ${stageFilter === 'replied' ? 'font-bold underline' : ''}`}
+            >
+              Replied: {replied.length}
+            </button>
+          )}
+          <button onClick={() => setStageFilter('t1')} className={stageFilter === 't1' ? 'font-bold text-ink underline' : ''}>
+            T1: {t1s.length}
+          </button>
+          <button onClick={() => setStageFilter('t2')} className={stageFilter === 't2' ? 'font-bold text-ink underline' : ''}>
+            T2: {t2s.length}
+          </button>
+          <button onClick={() => setStageFilter('t3')} className={stageFilter === 't3' ? 'font-bold text-ink underline' : ''}>
+            T3: {t3s.length}
+          </button>
         </div>
 
         <label className="mt-2 flex items-center gap-1.5 text-body-sm text-muted">

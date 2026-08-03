@@ -98,6 +98,13 @@ export default function DetailFooter({ lead, onUpdated }: DetailFooterProps) {
     onUpdated()
   }
 
+  async function parkLead() {
+    setBusy(true)
+    await supabase.from('leads').update({ status: 'parked' }).eq('id', lead.id)
+    setBusy(false)
+    onUpdated()
+  }
+
   return (
     <div className="border-t border-line bg-card px-4 py-3 shadow-[0_-4px_12px_rgba(0,0,0,0.03)]">
       {noteOpen && (
@@ -188,6 +195,13 @@ export default function DetailFooter({ lead, onUpdated }: DetailFooterProps) {
             className="flex items-center gap-1.5 rounded border border-line px-4 py-2 text-body-sm font-bold text-ink transition-colors hover:bg-soft disabled:opacity-50"
           >
             <Icon name="edit_note" size={18} /> Log note
+          </button>
+          <button
+            onClick={parkLead}
+            disabled={busy}
+            className="flex items-center gap-1.5 rounded border border-line px-4 py-2 text-body-sm font-bold text-ink transition-colors hover:bg-soft disabled:opacity-50"
+          >
+            <Icon name="pause_circle" size={18} /> Park
           </button>
         </div>
 

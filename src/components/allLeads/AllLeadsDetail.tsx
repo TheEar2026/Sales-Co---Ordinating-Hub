@@ -42,18 +42,35 @@ export default function AllLeadsDetail({ lead, onUpdated }: AllLeadsDetailProps)
     onUpdated()
   }
 
-  async function moveToMotionB() {
+  // Parking only ever changes `status`, never `motion` — so a lead parked
+  // from Motion A still has motion:'A' while parked, which lets revival
+  // send it back to whoever it came from (Rus vs. Badi) instead of always
+  // dropping it into Motion B's queue regardless of origin.
+  async function revive() {
     if (!canEdit) return
-    await supabase
-      .from('leads')
-      .update({
-        motion: 'B',
-        owner: 'coordinator',
-        status: 'untouched',
-        needs_review: true,
-        review_reason: 'Revived from Parked — see notes for approach.',
-      })
-      .eq('id', lead.id)
+    if (lead.motion === 'A') {
+      await supabase
+        .from('leads')
+        .update({
+          owner: 'rus',
+          motion: 'A',
+          status: 'untouched',
+          needs_review: true,
+          review_reason: 'Revived from Parked — see notes for approach.',
+        })
+        .eq('id', lead.id)
+    } else {
+      await supabase
+        .from('leads')
+        .update({
+          motion: 'B',
+          owner: 'coordinator',
+          status: 'untouched',
+          needs_review: true,
+          review_reason: 'Revived from Parked — see notes for approach.',
+        })
+        .eq('id', lead.id)
+    }
     onUpdated()
   }
 
@@ -79,10 +96,10 @@ export default function AllLeadsDetail({ lead, onUpdated }: AllLeadsDetailProps)
             </span>
             {lead.status === 'parked' && canEdit && (
               <button
-                onClick={moveToMotionB}
+                onClick={revive}
                 className="rounded border border-gold px-2 py-0.5 text-[11px] font-bold uppercase tracking-wide text-gold-mid hover:bg-gold-light"
               >
-                Move to Motion B
+                {lead.motion === 'A' ? 'Move to Motion A' : 'Move to Motion B'}
               </button>
             )}
           </div>
