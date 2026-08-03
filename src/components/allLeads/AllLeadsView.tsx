@@ -15,6 +15,8 @@ const STATUS_LABELS: Record<LeadStatus, string> = {
   't1-sent': 'T1 sent',
   't2-sent': 'T2 sent',
   't3-sent': 'T3 sent',
+  't4-sent': 'T4 sent',
+  't5-sent': 'T5 sent',
   'reply-received': 'Reply received',
   'demo-booked': 'Demo booked',
   'demo-held': 'Demo held',
