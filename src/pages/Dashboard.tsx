@@ -111,51 +111,55 @@ export default function Dashboard() {
           templatesOpen ? 'mr-[420px]' : ''
         }`}
       >
-        {tab === 'motionA' && (
-          <div className="flex flex-1 overflow-hidden">
-            <LeadList
-              leads={motionALeads}
-              loading={motionALoading}
-              selectedId={selectedALead?.id ?? null}
-              onSelect={setSelectedALead}
+        {/* All four tab panels stay mounted and are only hidden via CSS —
+            conditionally rendering them (the previous {tab === 'x' && ...}
+            pattern) destroyed each panel's DOM/scroll position and local
+            state (search, filters) every time the user switched tabs. */}
+        <div className={tab === 'motionA' ? 'flex flex-1 overflow-hidden' : 'hidden'}>
+          <LeadList
+            leads={motionALeads}
+            loading={motionALoading}
+            selectedId={selectedALead?.id ?? null}
+            onSelect={setSelectedALead}
+          />
+          {selectedALead ? (
+            <LeadDetail lead={selectedALead} onUpdated={refetchA} />
+          ) : (
+            <div className="flex flex-1 items-center justify-center bg-soft text-body-md text-muted">
+              Select a lead to see details.
+            </div>
+          )}
+        </div>
+
+        <div className={tab === 'motionB' ? 'flex flex-1 overflow-hidden' : 'hidden'}>
+          <OutreachQueue
+            leads={motionBLeads}
+            loading={motionBLoading}
+            selectedId={selectedBLead?.id ?? null}
+            doneIds={doneIds}
+            onSelect={setSelectedBLead}
+          />
+          {selectedBLead ? (
+            <ComposePanel
+              lead={selectedBLead}
+              onDone={() => markBLeadDone(selectedBLead.id)}
+              onUpdated={refetchB}
+              onToast={(type, message) => setToast({ type, message })}
             />
-            {selectedALead ? (
-              <LeadDetail lead={selectedALead} onUpdated={refetchA} />
-            ) : (
-              <div className="flex flex-1 items-center justify-center bg-soft text-body-md text-muted">
-                Select a lead to see details.
-              </div>
-            )}
-          </div>
-        )}
+          ) : (
+            <div className="flex flex-1 items-center justify-center bg-soft text-body-md text-muted">
+              Select a lead from the queue.
+            </div>
+          )}
+        </div>
 
-        {tab === 'motionB' && (
-          <div className="flex flex-1 overflow-hidden">
-            <OutreachQueue
-              leads={motionBLeads}
-              loading={motionBLoading}
-              selectedId={selectedBLead?.id ?? null}
-              doneIds={doneIds}
-              onSelect={setSelectedBLead}
-            />
-            {selectedBLead ? (
-              <ComposePanel
-                lead={selectedBLead}
-                onDone={() => markBLeadDone(selectedBLead.id)}
-                onUpdated={refetchB}
-                onToast={(type, message) => setToast({ type, message })}
-              />
-            ) : (
-              <div className="flex flex-1 items-center justify-center bg-soft text-body-md text-muted">
-                Select a lead from the queue.
-              </div>
-            )}
-          </div>
-        )}
+        <div className={tab === 'allLeads' ? 'contents' : 'hidden'}>
+          <AllLeadsView />
+        </div>
 
-        {tab === 'allLeads' && <AllLeadsView />}
-
-        {tab === 'scorecard' && <ScorecardView />}
+        <div className={tab === 'scorecard' ? 'contents' : 'hidden'}>
+          <ScorecardView />
+        </div>
       </div>
 
       {templatesOpen && <TemplateEditor onClose={() => setTemplatesOpen(false)} />}

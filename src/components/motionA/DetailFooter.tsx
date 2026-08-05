@@ -45,9 +45,16 @@ export default function DetailFooter({ lead, onUpdated }: DetailFooterProps) {
       sent_date: today,
     })
 
+    // Clear next_touch_date only once it's actually arrived — otherwise
+    // it's a one-way ratchet (nothing else ever clears/advances it), so
+    // leads pile up permanently in "Due today" regardless of how many
+    // times they're recontacted. A deliberately-future-dated reminder
+    // is left alone since an unrelated touch shouldn't wipe it early.
+    const clearedTouchDate = lead.next_touch_date && lead.next_touch_date <= today ? null : lead.next_touch_date
+
     await supabase
       .from('leads')
-      .update({ touch_count: lead.touch_count + 1, last_touch_date: today })
+      .update({ touch_count: lead.touch_count + 1, last_touch_date: today, next_touch_date: clearedTouchDate })
       .eq('id', lead.id)
 
     setBusy(false)
