@@ -311,6 +311,15 @@ export const mockLeads: Lead[] = [
     last_touch_date: daysAgo(3),
     next_touch_date: daysAgo(-3),
   }),
+  // Untouched lead flagged as a Creative Arts teacher — cross-profile
+  // persona, exercises the new P7 template sequence.
+  lead({
+    contact_name: 'Carla Isaacs',
+    contact_role: 'Creative Arts Teacher',
+    school_name: 'Fairview Primary',
+    persona: 'P7',
+    status: 'untouched',
+  }),
   // T4/T5 temporary stopgap — leads that exhausted T1-T3 and used to
   // vanish from the queue entirely (supabase_schema_patch_14.sql).
   lead({
@@ -539,6 +548,21 @@ export const mockTemplates: Template[] = [
     'P6', 'T1', 'intro', 'P6 T1 — School Group',
     'The same standard of music across every {{school_name}} campus',
     `Hi {{first_name}},\n\nWe work with school groups to deliver a consistent, curriculum-aligned music programme across multiple campuses from a single platform.\n\nWould you be open to a 20-minute call?\n\n${SIGNATURE}`,
+  ),
+  template(
+    'P7', 'T1', 'intro', 'P7 T1 — Creative Arts (Cross-Profile)',
+    'Supporting music in your Creative Arts classroom',
+    `Hi {{first_name}},\n\nThe Ear Academy is a music resource library and CPD platform for schools, built so Creative Arts and classroom teachers can deliver confident, structured music lessons without needing to be a music specialist themselves, whether music is already part of your school's offering or you're just getting started.\n\nCAPS-aligned lessons come complete with plans, slides and resources, and built-in SACE-accredited professional development builds your confidence as you teach, not before you start. It's also part of the well-rounded education parents look for.\n\nHere's a short overview of what's included and how it could fit into your Creative Arts programme: https://canva.link/a0b9ocqcta36py6\n\nAre you available in the next few days for an online call? I'd love to show you the platform and explore what it could look like in your Creative Arts classroom.\n\n${SIGNATURE}`,
+  ),
+  template(
+    'P7', 'T2', 'followup', 'P7 T2 — Creative Arts Follow-up',
+    'Re: Supporting music in your Creative Arts classroom',
+    `Hi {{first_name}},\n\nCircling back on this, in case it got buried last week.\n\nThe Ear Academy is a music resource library and CPD platform for schools, built so Creative Arts and classroom teachers can deliver confident, structured music lessons without needing to be a music specialist themselves, whether music is already part of your school's offering or you're just getting started.\n\nCAPS-aligned lessons come complete with plans, slides and resources, and built-in SACE-accredited professional development builds your confidence as you teach, not before you start. It's also part of the well-rounded education parents look for.\n\nHere's a short overview of what's included and how it could fit into your Creative Arts programme: https://canva.link/a0b9ocqcta36py6\n\nAre you available in the next few days for an online call? I'd love to show you the platform and explore what it could look like in your Creative Arts classroom.\n\n${SIGNATURE}`,
+  ),
+  template(
+    'P7', 'T3', 'followup', 'P7 T3 — Creative Arts Third Touch',
+    'Did this reach you?',
+    `Hi {{first_name}},\n\nDid my last couple of emails reach you? Term-time inboxes move fast, so it's entirely possible they got buried.\n\nI'm biased, obviously — but I think if you saw what's available in the platform, you'd find it genuinely exciting for your Creative Arts classroom, not just useful.\n\nAre you free for a short call this week or next?\n\n${SIGNATURE}`,
   ),
 ]
 

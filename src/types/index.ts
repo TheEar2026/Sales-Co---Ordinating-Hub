@@ -21,7 +21,7 @@ export type LeadStatus =
   | 'declined'
   | 'blocked'
 
-export type PersonaCode = 'P1' | 'P2' | 'P3' | 'P4' | 'P5' | 'P6'
+export type PersonaCode = 'P1' | 'P2' | 'P3' | 'P4' | 'P5' | 'P6' | 'P7'
 
 export type TouchNumber = 'T1' | 'T2' | 'T3' | 'T4' | 'T5' | 'T6' | 'T7' | 'T8'
 

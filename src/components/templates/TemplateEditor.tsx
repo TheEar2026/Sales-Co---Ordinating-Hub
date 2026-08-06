@@ -6,7 +6,7 @@ import type { PersonaCode, Template } from '../../types'
 import LoadingSpinner from '../shared/LoadingSpinner'
 import Icon from '../shared/Icon'
 
-const PERSONAS: PersonaCode[] = ['P1', 'P2', 'P3', 'P4', 'P5', 'P6']
+const PERSONAS: PersonaCode[] = ['P1', 'P2', 'P3', 'P4', 'P5', 'P6', 'P7']
 
 const SAMPLE_MERGE: Record<string, string> = {
   first_name: 'Alex',

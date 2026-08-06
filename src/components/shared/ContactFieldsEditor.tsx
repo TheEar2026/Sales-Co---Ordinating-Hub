@@ -15,6 +15,7 @@ const PERSONA_OPTIONS: { value: PersonaCode; label: string }[] = [
   { value: 'P4', label: 'P4 — No Music (Values/Enrichment)' },
   { value: 'P5', label: 'P5 — Budget-Constrained' },
   { value: 'P6', label: 'P6 — School Group' },
+  { value: 'P7', label: 'P7 — Creative Arts (cross-profile)' },
 ]
 
 interface FieldProps {
